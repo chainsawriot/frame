@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Frame? Kein Thema!</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Chung-hong Chan, Rainer Freundenthaler" />
+    <meta name="date" content="2022-08-05" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view-0.2.6/tile-view.js"></script>
+    <link href="libs/animate.css-xaringan-3.7.2/animate.fade.css" rel="stylesheet" />
+    <script src="libs/footer-0.0.3/footer.js"></script>
+    <link rel="stylesheet" href="mzes_fonts.css" type="text/css" />
+    <link rel="stylesheet" href="mzes.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Frame? Kein Thema!
+]
+.subtitle[
+## Die Validität der induktiven Frame-Erkennung in Texten mit mehreren Themen
+]
+.author[
+### Chung-hong Chan, Rainer Freundenthaler
+]
+.date[
+### 2022-08-05
+]
+
+---
+
+# So, are these frames?
+
+
+
+
+.pull-left[
+![](img/antmn.png)
+
+.extrasmall[Walter &amp; Ophir (2019)]
+
+]
+
+.pull-right[
+&lt;img src="img/lda.png" height = 170&gt;
+
+.extrasmall[Ylä-Anttila, Eranti, &amp; Kukkonen. (2022)]
+
+&lt;img src="img/lda_ai.png" height = 170&gt;
+
+.extrasmall[Zeng, Chan &amp; Schäfer (2019)]
+
+]
+
+---
+
+.extralarge["Some studies employ the concept only in a metaphoric sense, whereas others reduce frames to story topics, attributes, or issue position"]
+
+Carragee &amp; Roefs (2004)
+
+---
+
+**Entmanian Frame:** "Select some aspects of a perceived reality and make them more salient in a communicating text, in such a way as to promote a particular problem definition, causal interpretation, moral evaluation, and/or treatment recommendation for the item described."
+
+**Chan's restatement:** Frame is the result of an act of **selecting** certain aspects of a perceived reality by a communicator, whose **intention** is to promote a particular problem definition, causal interpretation, moral evalution, and/or treatment recommendation.
+
+---
+
+# What actually is frame detection?
+
+.extralarge[
+* Evaluate which aspects of a perceived reality are selected?
+* Guess the communicator's intention?
+]
+
+---
+class: hide-footer
+
+
+![](img/landmesser.jpg)
+
+---
+class: hide-footer
+
+
+![](img/landmesser2.jpg)
+
+---
+class: hide-footer
+
+
+![](img/landmesser3.png)
+
+---
+class: hide-footer
+
+# Generic frames
+
+"**transcend** thematic limitations and can be identified in relation to different topics, some even over time and in different cultural contexts" (de Vreese, 2005, p. 54, emphasis added)
+
+LDA and co. are good at detecting issues.
+
+![](img/valk.png)
+
+.extrasmall[Semetko &amp; Valkenburg (2000)]
+
+---
+# Make topics not correlated with frames
+
+* "Counterfactual" synthetic corpus
+* Communicators (some MA student helpers) were asked to write news articles on a topic (Ukraine, Big Tech, Climate, Corona, and random topic) and with an intention to present one generic frame (Attribution of responsibility, conflict, economic consequence, human interest, morality).
+* Topics and frames are randomly assigned
+* Ground truth information about which frame the communicator would like to convey. (Platinum Standard)
+
+---
+# "Gold standard"
+
+* Two MA students coded according to the standard coding scheme
+
+&lt;img src="img/generic.png" height = 420&gt;
+
+---
+# Inductive methods
+
+* K-means with TFIDF (Burscher et al., 2016), PCA with TF-IDF (Greussing &amp; Boomgaarden, 2017), LDA (DiMaggio et al., 2013), STM (Nicholls &amp; Culpepper, 2021), ANTMN (Walter &amp; Ophir, 2019)
+
+# Semi-supervised methods
+
+* Seeded-LDA (Watanabe &amp; Zhou, 2020)
+* keyATM (Eshima et al., 2020)
+
+Keywords from two journalism researchers
+
+k = 5
+
+---
+# So many methodological decisions
+
+* stemming, lemmatizing, trimming of sparse / frequent words, stopwords, `\(\alpha\)`
+* Which dictionary?
+* How many coders?
+* How to determine frames with the coding scheme (average, factor analysis, binary, Likert3)?
+
+* Multiverse Analysis (Pipal, Song, Boomgaarden, 2022)
+
+---
+# What surely doesn't work
+
+&lt;img src="img/km_gg.png" height = 420&gt;
+
+---
+# What almost doesn't work
+
+&lt;img src="img/pca_gg.png" height = 420&gt;
+
+---
+# What work-ish
+
+.pull-left[
+&lt;img src="img/stm_gg.png" height = 420&gt;
+]
+
+.pull-right[
+&lt;img src="img/lda_gg.png" height = 420&gt;
+]
+
+---
+# What occasionally works, but with a large multiverse
+
+.pull-left[
+&lt;img src="img/antmn_gg.png" height = 420&gt;
+]
+
+.pull-left[
+&lt;img src="img/seeded_gg.png" height = 420&gt;
+]
+
+---
+# What works most of the time, even with a large multiverse
+
+&lt;img src="img/keyatm_gg.png" height = 420&gt;
+
+---
+# The golden question: Does gold standard work?
+
+--
+
+.pull-left[
+&lt;img src="img/human_gg.png" height = 420&gt;
+]
+
+.pull-right[
+Not as greatly as I expected. 
+]
+
+---
+# Preliminary findings
+
+* Human, the best, but not superb.
+  * Low reliability, not exclusionary
+* keyATM, human-like performance. Could consider.
+* Some topic models can deliver better than null performance. But better not use them.
+* Some methods (K-means, PCA) can't deliever better than null performance. Don't use them.
+
+* Meta point: you don't know the performance without validation. You don't know the performance of gold standard without platinum standard. 
+
+But you don't know the performance of platinum without uranium standard. And we don't have uranium standard.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+(function(time) {
+  var d2 = function(number) {
+    return ('0' + number).slice(-2); // left-pad 0 to minutes/seconds
+  },
+
+  time_format = function(total) {
+    var secs = Math.abs(total) / 1000;
+    var h = Math.floor(secs / 3600);
+    var m = Math.floor(secs % 3600 / 60);
+    var s = Math.round(secs % 60);
+    var res = d2(m) + ':' + d2(s);
+    if (h > 0) res = h + ':' + res;
+    return res;  // [hh:]mm:ss
+  },
+
+  slide_number_div = function(i) {
+    return document.getElementsByClassName('remark-slide-number').item(i);
+  },
+
+  current_page_number = function(i) {
+    return slide_number_div(i).firstChild.textContent;  // text "i / N"
+  };
+
+  var timer = document.createElement('span'); timer.id = 'slide-time-left';
+  var time_left = time, k = slideshow.getCurrentSlideIndex(),
+      last_page_number = current_page_number(k);
+
+  setInterval(function() {
+    time_left = time_left - 1000;
+    timer.innerHTML = ' ' + time_format(time_left);
+    if (time_left < 0) timer.style.color = 'red';
+  }, 1000);
+
+  slide_number_div(k).appendChild(timer);
+
+  slideshow.on('showSlide', function(slide) {
+    var i = slide.getSlideIndex(), n = current_page_number(i);
+    // reset timer when a new slide is shown and the page number is changed
+    if (last_page_number !== n) {
+      time_left = time; last_page_number = n;
+      timer.innerHTML = ' ' + time_format(time); timer.style.color = null;
+    }
+    slide_number_div(i).appendChild(timer);
+  });
+})(60000);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

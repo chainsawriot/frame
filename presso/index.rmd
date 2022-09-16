@@ -1,0 +1,201 @@
+---
+title: "Frame? Kein Thema!"
+subtitle: "Die Validität der induktiven Frame-Erkennung in Texten mit mehreren Themen"
+author: "Chung-hong Chan, Rainer Freundenthaler"
+date: "`r Sys.Date()`"
+params:
+  animation: "fade"
+  twitter: "chainsawriot"
+output:
+  xaringan::moon_reader:
+    css: [default, mzes_fonts.css, mzes.css]
+    lib_dir: libs
+    nature:
+      countdown: 60000
+      highlightStyle: github
+      countIncrementalSlides: false
+      ratio: '16:9'
+---
+# So, are these frames?
+
+```{r xaringanExtra, echo = FALSE}
+xaringanExtra::use_tile_view()
+xaringanExtra::use_animate_all(params$animation)
+#xaringanExtra::use_logo(image_url = "img/mzes_logo.png", width = 280)
+mzesalike::use_footer(params)
+```
+
+
+.pull-left[
+![](img/antmn.png)
+
+.extrasmall[Walter & Ophir (2019)]
+
+]
+
+.pull-right[
+<img src="img/lda.png" height = 170>
+
+.extrasmall[Ylä-Anttila, Eranti, & Kukkonen. (2022)]
+
+<img src="img/lda_ai.png" height = 170>
+
+.extrasmall[Zeng, Chan & Schäfer (2019)]
+
+]
+
+---
+
+.extralarge["Some studies employ the concept only in a metaphoric sense, whereas others reduce frames to story topics, attributes, or issue position"]
+
+Carragee & Roefs (2004)
+
+---
+
+**Entmanian Frame:** "Select some aspects of a perceived reality and make them more salient in a communicating text, in such a way as to promote a particular problem definition, causal interpretation, moral evaluation, and/or treatment recommendation for the item described."
+
+**Chan's restatement:** Frame is the result of an act of **selecting** certain aspects of a perceived reality by a communicator, whose **intention** is to promote a particular problem definition, causal interpretation, moral evalution, and/or treatment recommendation.
+
+---
+
+# What actually is frame detection?
+
+.extralarge[
+* Evaluate which aspects of a perceived reality are selected?
+* Guess the communicator's intention?
+]
+
+---
+class: hide-footer
+
+
+![](img/landmesser.jpg)
+
+---
+class: hide-footer
+
+
+![](img/landmesser2.jpg)
+
+---
+class: hide-footer
+
+
+![](img/landmesser3.png)
+
+---
+class: hide-footer
+
+# Generic frames
+
+"**transcend** thematic limitations and can be identified in relation to different topics, some even over time and in different cultural contexts" (de Vreese, 2005, p. 54, emphasis added)
+
+LDA and co. are good at detecting issues.
+
+![](img/valk.png)
+
+.extrasmall[Semetko & Valkenburg (2000)]
+
+---
+# Make topics not correlated with frames
+
+* "Counterfactual" synthetic corpus
+* Communicators (some MA student helpers) were asked to write news articles on a topic (Ukraine, Big Tech, Climate, Corona, and random topic) and with an intention to present one generic frame (Attribution of responsibility, conflict, economic consequence, human interest, morality).
+* Topics and frames are randomly assigned
+* Ground truth information about which frame the communicator would like to convey. (Platinum Standard)
+
+---
+# "Gold standard"
+
+* Two MA students coded according to the standard coding scheme
+
+<img src="img/generic.png" height = 420>
+
+---
+# Inductive methods
+
+* K-means with TFIDF (Burscher et al., 2016), PCA with TF-IDF (Greussing & Boomgaarden, 2017), LDA (DiMaggio et al., 2013), STM (Nicholls & Culpepper, 2021), ANTMN (Walter & Ophir, 2019)
+
+# Semi-supervised methods
+
+* Seeded-LDA (Watanabe & Zhou, 2020)
+* keyATM (Eshima et al., 2020)
+
+Keywords from two journalism researchers
+
+k = 5
+
+---
+# So many methodological decisions
+
+* stemming, lemmatizing, trimming of sparse / frequent words, stopwords, $\alpha$
+* Which dictionary?
+* How many coders?
+* How to determine frames with the coding scheme (average, factor analysis, binary, Likert3)?
+
+* Multiverse Analysis (Pipal, Song, Boomgaarden, 2022)
+
+---
+# What surely doesn't work
+
+<img src="img/km_gg.png" height = 420>
+
+---
+# What almost doesn't work
+
+<img src="img/pca_gg.png" height = 420>
+
+---
+# What work-ish
+
+.pull-left[
+<img src="img/stm_gg.png" height = 420>
+]
+
+.pull-right[
+<img src="img/lda_gg.png" height = 420>
+]
+
+---
+# What occasionally works, but with a large multiverse
+
+.pull-left[
+<img src="img/antmn_gg.png" height = 420>
+]
+
+.pull-left[
+<img src="img/seeded_gg.png" height = 420>
+]
+
+---
+# What works most of the time, even with a large multiverse
+
+<img src="img/keyatm_gg.png" height = 420>
+
+---
+# The golden question: Does gold standard work?
+
+--
+
+.pull-left[
+<img src="img/human_gg.png" height = 420>
+]
+
+.pull-right[
+Not as greatly as I expected. 
+]
+
+---
+# Preliminary findings
+
+* Human, the best, but not superb.
+  * Low reliability, not exclusionary
+* keyATM, human-like performance. Could consider.
+* Some topic models can deliver better than null performance. But better not use them.
+* Some methods (K-means, PCA) can't deliever better than null performance. Don't use them.
+
+* Meta point: you don't know the performance without validation. You don't know the performance of gold standard without platinum standard. 
+
+But you don't know the performance of platinum without uranium standard. And we don't have uranium standard.
+
+
