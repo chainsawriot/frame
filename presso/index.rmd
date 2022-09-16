@@ -186,6 +186,13 @@ Not as greatly as I expected.
 ]
 
 ---
+# Acknowledgement
+
+The authors would like to thank the Open Science Office, University of Mannheim for the financial support of this project.
+
+Know more: https://www.uni-mannheim.de/open-science/open-science-office/
+
+---
 # Preliminary findings
 
 * Human, the best, but not superb.
@@ -197,5 +204,4 @@ Not as greatly as I expected.
 * Meta point: you don't know the performance without validation. You don't know the performance of gold standard without platinum standard. 
 
 But you don't know the performance of platinum without uranium standard. And we don't have uranium standard.
-
 
