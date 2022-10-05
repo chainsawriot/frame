@@ -3,8 +3,8 @@
   <head>
     <title>Frame? Kein Thema!</title>
     <meta charset="utf-8" />
-    <meta name="author" content="Chung-hong Chan, Rainer Freundenthaler" />
-    <meta name="date" content="2022-09-16" />
+    <meta name="author" content="Chung-hong Chan (GESIS), Rainer Freundenthaler (MZES)" />
+    <meta name="date" content="2022-10-05" />
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/tile-view-0.2.6/tile-view.css" rel="stylesheet" />
     <script src="libs/tile-view-0.2.6/tile-view.js"></script>
@@ -24,11 +24,20 @@ class: center, middle, inverse, title-slide
 ## Die Validität der induktiven Frame-Erkennung in Texten mit mehreren Themen
 ]
 .author[
-### Chung-hong Chan, Rainer Freundenthaler
+### Chung-hong Chan (GESIS), Rainer Freundenthaler (MZES)
 ]
 .date[
-### 2022-09-16
+### 2022-10-05
 ]
+
+---
+
+
+# Acknowledgement
+
+The authors would like to thank the Open Science Office, University of Mannheim for the financial support of this project.
+
+Know more: https://www.uni-mannheim.de/open-science/open-science-office/
 
 ---
 
@@ -99,33 +108,62 @@ class: hide-footer
 
 # Generic frames
 
-"**transcend** thematic limitations and can be identified in relation to different topics, some even over time and in different cultural contexts" (de Vreese, 2005, p. 54, emphasis added)
-
-LDA and co. are good at detecting issues.
+.pull-left[
+"**transcend** thematic limitations and can be identified in relation to different topics, some even over time and in different cultural contexts" (de Vreese, 2005)
 
 ![](img/valk.png)
 
+]
+
+.pull-right[
+![](img/dag1.png)
+
 .extrasmall[Semetko &amp; Valkenburg (2000)]
 
----
-# Make topics not correlated with frames
+]
 
-* "Counterfactual" synthetic corpus
-* Communicators (some MA student helpers) were asked to write news articles on a topic (Ukraine, Big Tech, Climate, Corona, and random topic) and with an intention to present one generic frame (Attribution of responsibility, conflict, economic consequence, human interest, morality).
-* Topics and frames are randomly assigned
-* Ground truth information about which frame the communicator would like to convey. (Platinum Standard)
+---
+# "Platinum" Standard: Communicative intention is known
+
+.pull-left[
+
+![](img/counterfactual.png)
+
+]
+
+.pull-right[
+![](img/dag2.png)
+
+]
+
 
 ---
 # "Gold standard"
 
-* Two MA students coded according to the standard coding scheme
-
+.pull-left[
 &lt;img src="img/generic.png" height = 420&gt;
+]
+
+.pull-right[
+Two trained MA students coded according to the standard coding scheme
+
+.extrasmall[Semetko &amp; Valkenburg (2000)]
+
+]
 
 ---
+
+.pull-left[
 # Inductive methods
 
-* K-means with TFIDF (Burscher et al., 2016), PCA with TF-IDF (Greussing &amp; Boomgaarden, 2017), LDA (DiMaggio et al., 2013), STM (Nicholls &amp; Culpepper, 2021), ANTMN (Walter &amp; Ophir, 2019)
+* K-means with TFIDF (Burscher et al., 2016)
+* PCA with TF-IDF (Greussing &amp; Boomgaarden, 2017)
+* LDA (DiMaggio et al., 2013)
+* STM (Nicholls &amp; Culpepper, 2021)
+* ANTMN (Walter &amp; Ophir, 2019)
+]
+
+.pull-right[
 
 # Semi-supervised methods
 
@@ -135,29 +173,32 @@ LDA and co. are good at detecting issues.
 Keywords from two journalism researchers
 
 k = 5
+]
 
 ---
 # So many methodological decisions
 
-* stemming, lemmatizing, trimming of sparse / frequent words, stopwords, `\(\alpha\)`
-* Which dictionary?
-* How many coders?
-* How to determine frames with the coding scheme (average, factor analysis, binary, Likert3)?
+* stemming, lemmatizing, trimming of sparse / frequent words, stopwords, `\(\alpha\)`, ...
 
 * Multiverse Analysis (Pipal, Song, Boomgaarden, 2022)
 
+.pull-left[
+&lt;img src="img/prereg.png" height = 100&gt;
+]
+
+
 ---
-# What surely doesn't work
+# Not better than random guess
 
 &lt;img src="img/km_gg.png" height = 420&gt;
 
 ---
-# What almost doesn't work
+# Slightly better than random guess
 
 &lt;img src="img/pca_gg.png" height = 420&gt;
 
 ---
-# What work-ish
+# Sometimes better than random guess
 
 .pull-left[
 &lt;img src="img/stm_gg.png" height = 420&gt;
@@ -168,7 +209,7 @@ k = 5
 ]
 
 ---
-# What occasionally works, but with a large multiverse
+# Sometimes better than random guess, but with a large multiverse
 
 .pull-left[
 &lt;img src="img/antmn_gg.png" height = 420&gt;
@@ -179,7 +220,7 @@ k = 5
 ]
 
 ---
-# What works most of the time, even with a large multiverse
+# Often better than random guess, even with a large multiverse
 
 &lt;img src="img/keyatm_gg.png" height = 420&gt;
 
@@ -193,28 +234,27 @@ k = 5
 ]
 
 .pull-right[
-Not as greatly as I expected. 
+Always better than random guess, but not superb
 ]
 
 ---
-# Acknowledgement
 
-The authors would like to thank the Open Science Office, University of Mannheim for the financial support of this project.
+# Zum Mitnehmen
 
-Know more: https://www.uni-mannheim.de/open-science/open-science-office/
+.pull-left[
+* Frame detection is not the same as finding topics (Carragee &amp; Roefs, 2004)
 
----
-# Preliminary findings
+* Detection of communicative intention from text is crazily hard, even human can't do it well. But..
 
-* Human, the best, but not superb.
-  * Low reliability, not exclusionary
-* keyATM, human-like performance. Could consider.
-* Some topic models can deliver better than null performance. But better not use them.
-* Some methods (K-means, PCA) can't deliever better than null performance. Don't use them.
+* OSF: https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a
 
-* Meta point: you don't know the performance without validation. You don't know the performance of gold standard without platinum standard. 
+(Or contact me)
 
-But you don't know the performance of platinum without uranium standard. And we don't have uranium standard.
+]
+
+.pull-right[
+&lt;img src="img/turtle.jpg" height = 420&gt;
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
