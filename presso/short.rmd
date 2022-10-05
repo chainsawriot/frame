@@ -1,0 +1,143 @@
+---
+title: "Frame corpus"
+author: "Chung-hong Chan (GESIS), Rainer Freundenthaler (MZES)"
+date: "`r Sys.Date()`"
+params:
+  animation: "fade"
+  twitter: "chainsawriot"
+output:
+  xaringan::moon_reader:
+    css: [default, mzes_fonts.css, mzes.css]
+    lib_dir: libs
+    nature:
+      countdown: 60000
+      highlightStyle: github
+      countIncrementalSlides: false
+      ratio: '16:9'
+---
+
+```{r xaringanExtra, echo = FALSE}
+xaringanExtra::use_tile_view()
+xaringanExtra::use_animate_all(params$animation)
+#xaringanExtra::use_logo(image_url = "img/mzes_logo.png", width = 280)
+mzesalike::use_footer(params)
+```
+
+# Acknowledgement
+
+The authors would like to thank the Open Science Office, University of Mannheim for the financial support of this project.
+
+Know more: https://www.uni-mannheim.de/open-science/open-science-office/
+
+---
+
+# Frame
+
+**Entmanian Frame:** "Select some aspects of a perceived reality and make them more salient in a communicating text, in such a way as to promote a particular problem definition, causal interpretation, moral evaluation, and/or treatment recommendation for the item described."
+
+**Chan's restatement:** Frame is the result of an act of **selecting** certain aspects of a perceived reality by a communicator, whose **intention** is to promote a particular problem definition, causal interpretation, moral evalution, and/or treatment recommendation.
+
+---
+
+# What actually is frame detection?
+
+.extralarge[
+* Evaluate which aspects of a perceived reality are selected?
+* Guess the communicator's intention?
+]
+
+---
+class: hide-footer
+
+
+![](img/landmesser.jpg)
+
+---
+class: hide-footer
+
+
+![](img/landmesser2.jpg)
+
+---
+class: hide-footer
+
+
+![](img/landmesser3.png)
+
+---
+class: hide-footer
+
+# Generic frames
+
+.pull-left[
+"**transcend** thematic limitations and can be identified in relation to different topics, some even over time and in different cultural contexts" (de Vreese, 2005)
+
+![](img/valk.png)
+
+]
+
+.pull-right[
+![](img/dag1.png)
+
+.extrasmall[Semetko & Valkenburg (2000)]
+
+]
+
+---
+# "Platinum" Standard: Communicative intention is known
+
+.pull-left[
+
+![](img/counterfactual.png)
+
+]
+
+.pull-right[
+![](img/dag2.png)
+
+]
+
+---
+# "Gold standard"
+
+.pull-left[
+<img src="img/generic.png" height = 420>
+]
+
+.pull-right[
+Two trained MA students coded according to the standard coding scheme
+
+.extrasmall[Semetko & Valkenburg (2000)]
+
+]
+
+---
+# The golden question: Does gold standard work?
+
+--
+
+.pull-left[
+<img src="img/human_gg.png" height = 420>
+]
+
+.pull-right[
+Always better than random guess, but not superb
+]
+
+---
+
+# Take-home message
+
+.pull-left[
+
+* Detection of communicative intention from text is crazily hard, even human can't do it well. But..
+
+* OSF: https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a
+
+(Or contact me)
+
+]
+
+.pull-right[
+<img src="img/turtle.jpg" height = 420>
+]
