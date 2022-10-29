@@ -152,7 +152,7 @@ Inspired by the calculation of best case complexity in the analysis of algorithm
 
 The null value for $CCR_{max}$ is 0.2, when $k = 5$ [@krippendorff:2011:AIR]. It is also possible to calculate the same null $CCR_{max}$ value when a method can perfectly tell topics and then shoehorn those topics as frames. This expected $CCR_{max}$ value should also be 0.2 theoretically, when frames and topics are randomly assigned. But due to the small sample size and idiosyncrasy of randomness, the *de facto* null value of $CCR_{max}$ is 0.3 in our 100 frame-topic pairs. In the figures below, we indicate both null values. One can think about the two null values as "can tell neither topics nor frames from the data" and "can tell topics but not frames from the data".
 
-We reported also the 95\% confidence interval of $CCR_{max}$.
+We reported also the 89\% confidence interval of $CCR_{max}$ [@mcelreath2020statistical].
 
 # Results
 
@@ -160,68 +160,86 @@ We reported also the 95\% confidence interval of $CCR_{max}$.
 
 ### K-Means + TF-IDF
 
-Figure \@ref(fig:km) shows the result of multiverse analysis of the frame detection method proposed by @burscher:2016:FBW. There is not enough evidence to support that the method can deliver significantly better or worse performance than random guess in all combinations of methodological decisions.
-
 ```{r km, fig.cap = "Multiverse analysis of K-Means"}
-readRDS("KM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se), method = "K-Means") %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("KM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "K-Means") -> kmx
+
+kmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
+
+Figure \@ref(fig:km) shows the result of multiverse analysis of the frame detection method proposed by @burscher:2016:FBW. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in in `r as.integer((sum(kmx$lower < 0.3) / nrow(kmx)) * 100)`\% of the combinations of methodological decisions.
 
 ### Principal Component Analysis + TF-IDF
 
-Figure \@ref(fig:pca) shows the result of multiverse analysis of the frame detection method proposed by @greussing:2017:S. There is not enough evidence to support that the method can deliver significantly better or worse performance than random guess in all combinations of methodological decisions.
-
 ```{r pca, fig.cap = "Multiverse analysis of PCA"}
-readRDS("PCA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se), method = "K-Means") %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("PCA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "K-Means") -> pcax
+
+pcax %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
+
+Figure \@ref(fig:pca) shows the result of multiverse analysis of the frame detection method proposed by @greussing:2017:S. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(pcax$lower < 0.3) / nrow(pcax)) * 100)`\% of the combinations of methodological decisions.
 
 ### LDA
 
-Figure \@ref(fig:lda) shows the result of multiverse analysis of the frame detection method proposed by @dimaggio:2013:E. There is not enough evidence to support that the method can deliver significantly better or worse performance than random guess in around 2/3 of the combinations of methodological decisions.
-
 ```{r lda, fig.cap = "Multiverse analysis of LDA", fig.height = 8}
-readRDS("LDA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se), method = "LDA") %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("LDA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> ldax
+
+ldax %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
+
+Figure \@ref(fig:lda) shows the result of multiverse analysis of the frame detection method proposed by @dimaggio:2013:E. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(ldax$lower < 0.3) / nrow(ldax)) * 100)`\% of the combinations of methodological decisions.
 
 ### STM
 
-Figure \@ref(fig:stm) shows the result of multiverse analysis of the frame detection method proposed by @nicholls:2020:CIM. There is not enough evidence to support that the method can deliver significantly better or worse performance than random guess in all combinations of methodological decisions.
-
 ```{r stm, fig.cap = "Multiverse analysis of STM", fig.height = 8}
-readRDS("STM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se), method = "LDA") %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("STM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> stmx
+
+stmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
+
+Figure \@ref(fig:stm) shows the result of multiverse analysis of the frame detection method proposed by @nicholls:2020:CIM. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in in `r as.integer((sum(stmx$lower < 0.3) / nrow(stmx)) * 100)`\% of the combinations of methodological decisions.
+
 
 ### ANTMN
 
-Figure \@ref(fig:antmn) shows the result of multiverse analysis of the frame detection method proposed by @walter:2019:NFA. There is not enough evidence to support that the method can deliver significantly better or worse performance than random guess in 95\% of the combinations of methodological decisions.
-
 ```{r antmn, fig.cap = "Multiverse analysis of ANTMN", fig.height = 8}
-readRDS("ANTMN.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se), method = "ANTMN") %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("ANTMN.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "ANTMN") -> antmnx
+
+antmnx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
+
+
+Figure \@ref(fig:antmn) shows the result of multiverse analysis of the frame detection method proposed by @walter:2019:NFA. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(antmnx$lower < 0.3) / nrow(antmnx)) * 100)`\% of the combinations of methodological decisions.
 
 ## Semisupervised methods
 
 ### Seeded-LDA
 
-Figure \@ref(fig:seeded) shows the result of multiverse analysis of Seeded-LDA [@watanabe:2020:TDA]. There is not enough evidence to support that the method can deliver significantly better or worse performance than random guess in around 2/3 of the combinations of methodological decisions.
-
 ```{r seeded, fig.cap = "Multiverse analysis of seeded-LDA", fig.height = 8}
-readRDS("SEEDED.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se), method = "LDA") %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange()+ xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("SEEDED.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> seededx
+
+seededx  %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange()+ xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
+
+
+Figure \@ref(fig:seeded) shows the result of multiverse analysis of Seeded-LDA [@watanabe:2020:TDA]. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(seededx$lower < 0.3) / nrow(seededx)) * 100)`\% of the combinations of methodological decisions.
 
 ### keyATM
 
-Figure \@ref(fig:keyatm) shows the result of multiverse analysis of keyATM [@eshima2020keyatm]. There is not enough evidence to support that the method can deliver significantly better or worse performance than random guess in 90\% of the combinations of methodological decisions.
-
 ```{r keyatm, fig.cap = "Multiverse analysis of keyATM", fig.height = 8}
-readRDS("KEYATM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se), method = "LDA") %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange()+ xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("KEYATM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> keyatmx
+
+keyatmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange()+ xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
+
+
+Figure \@ref(fig:keyatm) shows the result of multiverse analysis of keyATM [@eshima2020keyatm]. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(keyatmx$lower < 0.3) / nrow(keyatmx)) * 100)`\% of the combinations of methodological decisions.
 
 ## "Gold Standard"
 
-Figure \@ref(fig:human) shows the result of multiverse analysis of the "Gold Standard". The multiverse analysis suggests that the "Gold Standard" can detect frames in the multi-topical news content better than random guess, regardless of methodological decisions. However, the performance is not as high as one would expect. The best of the best is only around .5.
+Figure \@ref(fig:human) shows the result of multiverse analysis of the "Gold Standard". The multiverse analysis suggests that the "Gold Standard" can detect frames in the multi-topical news content better than null, regardless of methodological decisions. However, the performance is not as high as one would expect. The best of the best is only around .5.
 
 ```{r human, fig.cap = "Multiverse analysis of the \"Gold Standard\""}
-readRDS("human_accuracy.RDS") %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+readRDS("human_accuracy.RDS") %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
 
 ## Comparison of methods
@@ -246,7 +264,7 @@ We don't have an answer to the above question, because we didn't study supervise
 
 Having said so, it is our (this paper's authors') hubris that our "platinum standard" can capture the four students' communicator intentions. Our approach creates a "turtles all the way down" situation of who can tell whether the four students' communicator intentions have been adequately expressed in the content they produced. We cannot defend this criticism because this is an infinite regress. Another weakness of this paper is the fact that the communicators employed for this study are not professional journalists. Journalists might have a better ability to communicate their intentions than our four students. If one has the resource to do so, we strongly recommend replicating this study with journalists.
 
-Another limitation is the sample size. With the sample size of 100, this study has no say about the equivalence among methods and null. We can only check our superiority hypotheses (H1 and H2).  We refrained from concluding that a method is equivalent to random guess. We can only say that there is not enough evidence to suggest a method is better or worse than random guess. The former kind of equivalence conclusions can only be drawn with a different study design [see a primer by @weber:2012:TEC]. Suppose one would need to test the equivalence hypothesis, the required sample size would be 13,708 (null value of 20\%; equivalence limit of 2\%; $\alpha$: 0.05; $\beta$: 0.2). To give a perspective to this sample size, the New York Times publishes around 230 new articles per day. The cost to produce this number of articles using our synthetic approach would be equivalent to asking journalists to write two-month worth of news content. Nonetheless, our apparently small sample size does not affect the confirmed superiority hypothesis (H1).
+Another limitation is the sample size. With the sample size of 100, this study has no say about the equivalence among methods and null. We can only check our superiority hypotheses (H1 and H2).  We refrained from concluding that a method is equivalent to null. We can only say that there is not enough evidence to suggest a method is better or worse than null. The former kind of equivalence conclusions can only be drawn with a different study design [see a primer by @weber:2012:TEC]. Suppose one would need to test the equivalence hypothesis, the required sample size would be 13,708 (null value of 20\%; equivalence limit of 2\%; $\alpha$: 0.05; $\beta$: 0.2). To give a perspective to this sample size, the New York Times publishes around 230 new articles per day. The cost to produce this number of articles using our synthetic approach would be equivalent to asking journalists to write two-month worth of news content. Nonetheless, our apparently small sample size does not affect the confirmed superiority hypothesis (H1).
 
 Despite all the limitations, we provided a benchmark dataset for evaluating frame detection methods (available [here](https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a)) and benchmarked various methods with it. The finding from this paper casts doubt on the validity of using automatic inductive methods to detect frames.
 
