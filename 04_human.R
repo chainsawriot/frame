@@ -35,6 +35,10 @@ possible_frames <- unique(frame_df$frame)
 perm15 <- combinat::permn(c(1,2,3,4,5))
 purrr::map_dbl(1:120, ~ sum(diag(table(frame_df$frame, possible_frames[match(hj, perm15[[.]])]))) / 100) %>% max -> onecoder
 
+## shoehorn
+topic_vector <- as.numeric(as.factor(frame_df$topic))
+purrr::map_dbl(1:120, ~ sum(diag(table(frame_df$frame, possible_frames[match(topic_vector, perm15[[.]])]))) / 100) %>% max
+
 
 hjhuman %>% mutate_all(~ . != 0) %>% mutate(avga = (A1+A2+A3+A4+A5)/5, avgb = (B1+B2+B3+B4)/4, avgc = (C1+ C2+ C3+C4)/4, avgd = (D1+ D2+ D3)/3, avge = (E1+ E2+ E3) / 3) %>% select(starts_with("avg")) %>% rowwise() %>% mutate(maxx = which.max(c(avga, avgb, avgc, avgd, avge))) %>% pull(maxx) -> hjb
 
@@ -77,6 +81,10 @@ purrr::map_dbl(1:120, ~ sum(diag(table(frame_df$frame, possible_frames[match(b_v
 
 as_tibble(varm$scores) %>% mutate(frame = frame_df$frame) %>% group_by(frame) %>% summarise_if(is.numeric, mean)
 
-tibble(desc = c("1 coder, avg", "1 coder, avg, binary", "1 coder, varimax", "two coders, avg", "two coders, varimax"), maxp = c(onecoder, onecoderb, onecoder_varimax, twocoders, twocoder_varimax)) %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.8), linetype = "dashed") + xlab("CCR") + ylab("Treatment")+ labs(title = "Gold Standard") + theme(legend.position = "none") -> human_gg
+tibble(desc = c("1 coder, avg", "1 coder, avg, binary", "1 coder, varimax", "two coders, avg", "two coders, varimax"), maxp = c(onecoder, onecoderb, onecoder_varimax, twocoders, twocoder_varimax)) -> human_accuracy
+
+saveRDS(human_accuracy, "human_accuracy.RDS")
+
+human_accuracy %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment")+ labs(title = "Gold Standard") + theme_minimal() + theme(legend.position = "none") -> human_gg
 
 ggsave("human_gg.png", human_gg)

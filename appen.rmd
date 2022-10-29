@@ -1,0 +1,21 @@
+---
+title             : "A benchmark dataset for detecting frames in multi-topical news content: Online Appendix"
+output:
+ papaja::apa6_pdf:
+   latex_engine: xelatex
+---
+
+```{r setup, include = FALSE}
+library(parameters)
+print2 <- function(x, y, r2 = TRUE) {
+    cat("## ", x, "\n")
+    suppressWarnings(print(print_md(parameters(y, ci = 0.89))))
+    if (r2) {
+        cat("$R^2$ = ", brms::bayes_R2(y)[1] , "\n\n")
+    }
+}
+```
+
+```{r, results = "asis", echo = FALSE}
+print2("", readRDS("brms_mod.RDS"))
+```
