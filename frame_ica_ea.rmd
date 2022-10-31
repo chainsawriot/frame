@@ -25,7 +25,7 @@ wordcount         : "5876"
 
 bibliography      : "/home/chainsawriot/dev/dotfiles/bib.bib"
 
-floatsintext      : no
+floatsintext      : yes
 linenumbers       : no
 draft             : no
 mask              : yes
