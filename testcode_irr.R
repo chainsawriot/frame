@@ -24,6 +24,16 @@ res2 <- purrr::map_dbl(3:21, cal_ka2, HJ = HJ, ZO = ZO)
 
 tibble(Q= colnames(HJ)[3:21], res, res2)
 
+PM <- rio::import(here::here("coded/FRAME Test Coding PM.xlsx")) %>% tibble::as_tibble()
+
+RF <- rio::import(here::here("coded/FRAME Test Coding RF.xlsx")) %>% tibble::as_tibble()
+
+res_pro <- purrr::map_dbl(3:21, cal_ka, HJ = PM, ZO = RF)
+res2_pro <- purrr::map_dbl(3:21, cal_ka2, HJ = PM, ZO = RF)
+
+tibble(Q= colnames(HJ)[3:21], res, res2)
+
+
 ## A1, A4, A5, B4, C2, C3, C4, D3, E1, E2, E3
 
 gen_data <- function(x, HJ, ZO) {
@@ -31,3 +41,4 @@ gen_data <- function(x, HJ, ZO) {
     colnames(res) <- NULL
     return(res)
 }
+
