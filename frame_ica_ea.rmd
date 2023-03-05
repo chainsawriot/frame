@@ -7,15 +7,19 @@ author:
     corresponding : yes
   - name          : "Rainer Freudenthaler"
     affiliation   : "2"
-
+  - name          : "Philipp Müller"
+    affiliation   : "3"
+    
 affiliation:
   - id            : "1"
     institution   : "GESIS - Leibniz-Institut für Sozialwissenschaften"
   - id            : "2"
     institution   : "Mannheimer Zentrum für Europäische Sozialforschung"
+  - id            : "3"
+    institution   : "Institute for Media and Communication Studies, University of Mannheim"
 
 authornote: |
-  The anonymized link to the online appendix of this submission: https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a. The authors would like to thank Valerie Hase (Ludwig-Maximilians-Universität München) for providing keywords to be used in this study. The authors would like to thank the Open Science Office, University of Mannheim, for the financial support.
+  The anonymized link to the online appendix of this submission: https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a. The authors would like to thank 1) Valerie Hase (Ludwig-Maximilians-Universität München) for providing keywords to be used in this study, 2) Open Science Office, University of Mannheim, for the financial support, and 3) student assistants: Filippo Borsato, Hannah Erb, Hyosun Jang, Fatih Ozhasar, Zeynep Özgülec, and Jonathan Vincent.
 
 abstract: |
   Frames are a central concept in communication research. Based on our literature review, we propose that frame detection is an act of detecting selected reality and communicative intention. We then highlight the conceptual and methodological issues of frame detection using computational methods. Due to the correlation between topics and frames, we provide a synthetic benchmark dataset for evaluating frames found in multi-topical news content. For the first time, the current study is able to benchmark manual coding and various automatic and semisupervised methods using this synthetic benchmark dataset. Based on the benchmark results, this study casts doubt on the validity of frame detection using automatic inductive methods such as Structural Topic Models (STM) and Analysis of Topic Model Networks (ANTMN).
