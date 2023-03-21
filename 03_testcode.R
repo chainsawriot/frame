@@ -1,9 +1,9 @@
 require(irr)
 require(tidyverse)
 
-HJ <- rio::import(here::here("coded/Test coding HJ.xlsx")) %>% tibble::as_tibble()
+HJ <- rio::import(here::here("data", "testcoding/Test coding HJ.xlsx")) %>% tibble::as_tibble()
 
-ZO <- rio::import(here::here("coded/Test coding ZO.xlsx")) %>% tibble::as_tibble()
+ZO <- rio::import(here::here("data", "testcoding/Test coding ZO.xlsx")) %>% tibble::as_tibble()
 
 x <- 3
 cal_ka <- function(x, HJ, ZO) {
@@ -16,23 +16,19 @@ cal_ka2 <- function(x, HJ, ZO) {
     kripp.alpha(t(res), "nominal")$value
 }
 
-
-
-
 res <- purrr::map_dbl(3:21, cal_ka, HJ = HJ, ZO = ZO)
 res2 <- purrr::map_dbl(3:21, cal_ka2, HJ = HJ, ZO = ZO)
 
 tibble(Q= colnames(HJ)[3:21], res, res2)
 
-PM <- rio::import(here::here("coded/FRAME Test Coding PM.xlsx")) %>% tibble::as_tibble()
+PM <- rio::import(here::here("data", "testcoding/FRAME Test Coding PM.xlsx")) %>% tibble::as_tibble()
 
-RF <- rio::import(here::here("coded/FRAME Test Coding RF.xlsx")) %>% tibble::as_tibble()
+RF <- rio::import(here::here("data", "testcoding/FRAME Test Coding RF.xlsx")) %>% tibble::as_tibble()
 
 res_pro <- purrr::map_dbl(3:21, cal_ka, HJ = PM, ZO = RF)
 res2_pro <- purrr::map_dbl(3:21, cal_ka2, HJ = PM, ZO = RF)
 
-tibble(Q= colnames(HJ)[3:21], res, res2)
-
+tibble(Q= colnames(HJ)[3:21], res, res2, res_pro, res2_pro)
 
 ## A1, A4, A5, B4, C2, C3, C4, D3, E1, E2, E3
 
