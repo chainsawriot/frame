@@ -2,13 +2,21 @@ require(quanteda)
 #require(spacyr)
 require(tidyverse)
 set.seed(1212121)
-rio::import("Frame Corpus.xlsx") %>% tibble::as_tibble() -> frame_df
+rio::import(here::here("data", "Frame Corpus.xlsx")) %>% tibble::as_tibble() -> frame_df
+
+ipath <- function(fname) {
+    here::here("intermediate", fname)
+}
+
+fpath <- function(fname) {
+    here::here("figure", fname)
+}
 
 frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars = data.frame(frame = frame_df$frame))
 
-hjhuman <- rio::import("coding HJ.xlsx") %>%  select(-docid, -Content)
+hjhuman <- rio::import(here::here("data", "coding HJ.xlsx")) %>%  select(-docid, -Content)
 
-zohuman <- rio::import("coding ZO.xlsx") %>%  select(-docid, -Content)
+zohuman <- rio::import(here::here("data", "coding ZO.xlsx")) %>%  select(-docid, -Content)
 
 ## temp fix
 zohuman[29,] <- hjhuman[29,]
@@ -18,8 +26,6 @@ zohuman[,15] <- as.numeric(zohuman[,15])
 
 colnames(hjhuman) <- str_extract(colnames(hjhuman), "^[A-Z][0-9]")
 colnames(zohuman) <- str_extract(colnames(zohuman), "^[A-Z][0-9]")
-
-
 
 dist_mat <- dist(hjhuman)
 
@@ -83,8 +89,8 @@ as_tibble(varm$scores) %>% mutate(frame = frame_df$frame) %>% group_by(frame) %>
 
 tibble(desc = c("1 coder, avg", "1 coder, avg, binary", "1 coder, varimax", "two coders, avg", "two coders, varimax"), maxp = c(onecoder, onecoderb, onecoder_varimax, twocoders, twocoder_varimax)) -> human_accuracy
 
-saveRDS(human_accuracy, "human_accuracy.RDS")
+saveRDS(human_accuracy, ipath("human_accuracy.RDS"))
 
 human_accuracy %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment")+ labs(title = "Gold Standard") + theme_minimal() + theme(legend.position = "none") -> human_gg
 
-ggsave("human_gg.png", human_gg)
+ggsave(fpath("human_gg.png"), human_gg)

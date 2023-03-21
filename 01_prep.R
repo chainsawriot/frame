@@ -1,21 +1,27 @@
 require(quanteda)
 require(spacyr)
+## spacyr::spacy_install()
+suppressPackageStartupMessages(require(here))
+
+ipath <- function(fname) {
+    here::here("intermediate", fname)
+}
+
 set.seed(1212121)
-rio::import("Frame Corpus.xlsx") %>% tibble::as_tibble() -> frame_df
+rio::import(here::here("data", "Frame Corpus.xlsx")) %>% tibble::as_tibble() -> frame_df
 
 frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars = data.frame(frame = frame_df$frame))
 
 frame_corpus %>% tokens(remove_punct = TRUE, remove_numbers = TRUE, remove_separators = TRUE, remove_symbols = TRUE, split_hyphens = TRUE) %>% tokens_tolower() -> normal_tokens
-saveRDS(normal_tokens, "normal_tokens.RDS")
+saveRDS(normal_tokens, ipath("normal_tokens.RDS"))
 
 as.tokens(spacy_parse(frame_corpus), use_lemma = TRUE) %>% tokens(remove_punct = TRUE, remove_numbers = TRUE, remove_separators = TRUE, remove_symbols = TRUE, split_hyphens = TRUE) %>% tokens_tolower() -> lemma_tokens
 
-saveRDS(lemma_tokens, "lemma_tokens.RDS")
-saveRDS(frame_df, "frame_df.RDS")
+saveRDS(lemma_tokens, ipath("intermediate", "lemma_tokens.RDS"))
+saveRDS(frame_df, ipath("intermediate", "frame_df.RDS"))
 
 require(seededlda)
 require(combinat)
-
 
 conditions <- expand.grid(words = c("none", "stem", "lemma"), stopwords = c(TRUE, FALSE), trim = c(TRUE, FALSE), alpha = c(0.01, 0.05, 0.1, 0.2, 0.5, 1.0))
 
@@ -41,7 +47,7 @@ experiment <- function(words, stopwords, trim, alpha) {
 }
 
 res <- list()
-for(i in 1:72) {
+for(i in seq_len(nrow(conditions))) {
     print(i)
     res[[i]] <- experiment(conditions$words[i], conditions$stopwords[i], conditions$trim[i], conditions$alpha[i])
 }
@@ -49,7 +55,7 @@ for(i in 1:72) {
 ##purrr::map_dbl(res, max)
 LDA <- conditions
 LDA$res <- res
-saveRDS(tibble::tibble(LDA), "LDA.RDS")
+saveRDS(tibble::tibble(LDA), ipath("LDA.RDS"))
 
 require(stm)
 experiment2 <- function(words, stopwords, trim, alpha) {
@@ -83,7 +89,7 @@ for(i in 1:72) {
 ##purrr::map_dbl(res, max)
 STM <- conditions
 STM$res <- res
-saveRDS(tibble::tibble(STM), "STM.RDS")
+saveRDS(tibble::tibble(STM), ipath("STM.RDS"))
 
 experiment3 <- function(words, stopwords, trim) {
     if (words == "none") {
@@ -117,7 +123,7 @@ for(i in 1:nrow(conditions)) {
 
 KM <- conditions
 KM$res <- res
-saveRDS(tibble::tibble(KM), "KM.RDS")
+saveRDS(tibble::tibble(KM), ipath("KM.RDS"))
 
 experiment4 <- function(words, stopwords, trim) {
     if (words == "none") {
@@ -150,7 +156,7 @@ for(i in 1:nrow(conditions)) {
 
 PCA <- conditions
 PCA$res <- res
-saveRDS(tibble::tibble(PCA), "PCA.RDS")
+saveRDS(tibble::tibble(PCA), ipath("PCA.RDS"))
 
 
 require(igraph)
@@ -204,4 +210,4 @@ for(i in 1:nrow(conditions)) {
 
 ANTMN <- conditions
 ANTMN$res <- res
-saveRDS(tibble::tibble(ANTMN), "ANTMN.RDS")
+saveRDS(tibble::tibble(ANTMN), ipath("ANTMN.RDS"))

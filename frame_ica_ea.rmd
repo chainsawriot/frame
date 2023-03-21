@@ -48,6 +48,10 @@ output:
 library(papaja)
 library(tidyverse)
 library(brms)
+library(here)
+ireadRDS <- function(fname) {
+    readRDS(here::here("intermediate", fname))
+}
 ```
 
 ```{r analysis-preferences}
@@ -73,7 +77,7 @@ With this argument we do not mean to imply that communicators, journalists in pa
 With the tacit aspect of **communicative intention** making explicit, it raises several questions about frame detection. The most obvious question is: What exactly is detecting frames? Should it be judging which aspects of a perceived reality have been selected by a communicator? Or judging the original communicative intention of the communicator from the text? We propose that frame detection is an act of detecting both (selected aspect of a perceived reality and communicative intention) and we can't tell a frame from texts by just detect either one. We explain this problem by a graphical metaphor (Figure \@ref(fig:fig1)).
 
 ```{r fig1, echo = FALSE, fig.cap = 'A metaphor for frame detection'}
-knitr::include_graphics("fig1.png")
+knitr::include_graphics(here::here("figure", "fig1.png"))
 ```
 
 Suppose the crowd giving the Nazi salute is the reality. If we detect the man who does not give the Nazi salute (a selected aspect of a perceived reality) and claim that to a "frame" (Case A), it might resonate with the audience but with an ambiguous communicative intention: a Gestapo might select this aspect with a communicative intention to ask other citizens to hunt for this man; or a resistance fighter might select this aspect with a communicative intention to save this man or to ask other citizens to be like this man.
@@ -113,7 +117,7 @@ After we have given the "obligatory nod" [@reese:2007:FP] to the framing literat
 We randomly assigned 100 pairs of topics and frames (Table \@ref(tab:tab1)). The topics were "Ukraine", "corona", "tech companies", "climate" and "any topic". For the frames we used the generic frames following @semetko:2000:FE : "Attribution of responsibility", "Human interest", "Conflict", "Morality", und "(Economic) consequences". The topics and frames are independent (${\chi}^2$ = 17.7, df = 16, p = 0.34).
 
 ```{r tab1}
-rio::import("Frame Corpus.xlsx") %>% tibble::as_tibble() -> frame_df
+rio::import(here::here("data", "Frame Corpus.xlsx")) %>% tibble::as_tibble() -> frame_df
 frame_df$frame[frame_df$frame == "Economic Consequences"] <- "Conseq."
 frame_df$frame[frame_df$frame == "Human Interest"] <- "Hum. Int."
 frame_df$frame[frame_df$frame == "Responsibility"] <- "Resp."
@@ -169,7 +173,7 @@ We reported also the 89\% confidence interval of $CCR_{max}$ [@mcelreath2020stat
 ### K-Means + TF-IDF
 
 ```{r km, fig.cap = "Multiverse analysis of K-Means"}
-readRDS("KM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "K-Means") -> kmx
+ireadRDS("KM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "K-Means") -> kmx
 
 kmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
@@ -179,7 +183,7 @@ Figure \@ref(fig:km) shows the result of multiverse analysis of the frame detect
 ### Principal Component Analysis + TF-IDF
 
 ```{r pca, fig.cap = "Multiverse analysis of PCA"}
-readRDS("PCA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "K-Means") -> pcax
+ireadRDS("PCA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", "")), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "K-Means") -> pcax
 
 pcax %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
@@ -189,7 +193,7 @@ Figure \@ref(fig:pca) shows the result of multiverse analysis of the frame detec
 ### LDA
 
 ```{r lda, fig.cap = "Multiverse analysis of LDA", fig.height = 8}
-readRDS("LDA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> ldax
+ireadRDS("LDA.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> ldax
 
 ldax %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
@@ -199,7 +203,7 @@ Figure \@ref(fig:lda) shows the result of multiverse analysis of the frame detec
 ### STM
 
 ```{r stm, fig.cap = "Multiverse analysis of STM", fig.height = 8}
-readRDS("STM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> stmx
+ireadRDS("STM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> stmx
 
 stmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
@@ -209,7 +213,7 @@ Figure \@ref(fig:stm) shows the result of multiverse analysis of the frame detec
 ### ANTMN
 
 ```{r antmn, fig.cap = "Multiverse analysis of ANTMN", fig.height = 8}
-readRDS("ANTMN.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "ANTMN") -> antmnx
+ireadRDS("ANTMN.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "ANTMN") -> antmnx
 
 antmnx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none", axis.text.y = element_text(size = 3))
 ```
@@ -221,7 +225,7 @@ Figure \@ref(fig:antmn) shows the result of multiverse analysis of the frame det
 ### Seeded-LDA
 
 ```{r seeded, fig.cap = "Multiverse analysis of seeded-LDA", fig.height = 8}
-readRDS("SEEDED.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> seededx
+ireadRDS("SEEDED.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> seededx
 
 seededx  %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange()+ xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none", axis.text.y = element_text(size = 3))
 ```
@@ -231,7 +235,7 @@ Figure \@ref(fig:seeded) shows the result of multiverse analysis of Seeded-LDA [
 ### keyATM
 
 ```{r keyatm, fig.cap = "Multiverse analysis of keyATM", fig.height = 8}
-readRDS("KEYATM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> keyatmx
+ireadRDS("KEYATM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> keyatmx
 
 keyatmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange()+ xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none", axis.text.y = element_text(size = 3))
 ```
@@ -243,7 +247,7 @@ Figure \@ref(fig:keyatm) shows the result of multiverse analysis of keyATM [@esh
 Figure \@ref(fig:human) shows the result of multiverse analysis of the "Gold Standard". The multiverse analysis suggests that the "Gold Standard" can detect frames in the multi-topical news content better than null, regardless of methodological decisions. However, the performance is not as high as one would expect. The best of the best is only around .5.
 
 ```{r human, fig.cap = "Multiverse analysis of the \"Gold Standard\""}
-readRDS("human_accuracy.RDS") %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
+ireadRDS("human_accuracy.RDS") %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
 
 ## Comparison of methods
@@ -253,7 +257,7 @@ We modeled the $CCR_{max}$ from different methodological combinations of all met
 The regression model suggests that the automatic methods have a significantly lower accuracy than the "gold standard". This supports H1. However, there is no meaning difference between the automatic methods and semisupervised methods. There is not enough evidence to support H2.
 
 ```{r brms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semisupervised and automatic methods at 89% uncertainty"}
-plot(conditional_effects(readRDS("brms_mod.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+plot(conditional_effects(ireadRDS("brms_mod.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
 ```
 
 # Discussion

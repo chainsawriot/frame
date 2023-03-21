@@ -3,6 +3,12 @@ require(seededlda)
 require(combinat)
 require(quanteda)
 set.seed(1212121)
+suppressPackageStartupMessages(require(here))
+
+ipath <- function(fname) {
+    here::here("intermediate", fname)
+}
+
 
 resp <- c("cause","blame","guilt*","solution","necessary","insufficient","adequate","inadequate","useful","improv*","exacerbat*","pragmati*","*effective","*efficien*","avert","mistake","fail*","solve","accus*")
 
@@ -26,10 +32,10 @@ exp2 <- dictionary(list(resp = resp2, human = human2, conflict = conflict2, mora
 
 exp3 <- dictionary(list(resp = union(resp, resp2), human = union(human, human2), conflict = union(conflict, conflict2), moral = union(moral, moral2), econ = union(econ, econ2)))
 
-normal_tokens <- readRDS("normal_tokens.RDS")
+normal_tokens <- readRDS(ipath("normal_tokens.RDS"))
 
-lemma_tokens <- readRDS("lemma_tokens.RDS")
-frame_df <- readRDS("frame_df.RDS")
+lemma_tokens <- readRDS(ipath("lemma_tokens.RDS"))
+frame_df <- readRDS(ipath("frame_df.RDS"))
 
 conditions <- expand.grid(words = c("none", "stem", "lemma"), stopwords = c(TRUE, FALSE), trim = c(TRUE, FALSE), alpha = c(0.01, 0.05, 0.1, 0.2, 0.5, 1.0), expert = c(1, 2, 3))
 
@@ -62,7 +68,7 @@ for(i in seq_len(nrow(conditions))) {
 
 SEEDED <- conditions
 SEEDED$res <- res
-saveRDS(tibble::tibble(SEEDED), "SEEDED.RDS")
+saveRDS(tibble::tibble(SEEDED), ipath("SEEDED.RDS"))
 
 require(keyATM)
 
@@ -97,4 +103,4 @@ for(i in seq_len(nrow(conditions))) {
 
 KEYATM <- conditions
 KEYATM$res <- res
-saveRDS(tibble::tibble(KEYATM), "KEYATM.RDS")
+saveRDS(tibble::tibble(KEYATM), ipath("KEYATM.RDS"))
