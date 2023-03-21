@@ -17,5 +17,5 @@ print2 <- function(x, y, r2 = TRUE) {
 ```
 
 ```{r, results = "asis", echo = FALSE}
-print2("", readRDS("brms_mod.RDS"))
+print2("", readRDS(here::here("intermediate", "brms_mod.RDS")))
 ```
