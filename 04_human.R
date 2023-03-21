@@ -16,13 +16,14 @@ frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars 
 
 hjhuman <- rio::import(here::here("data", "coding HJ.xlsx")) %>%  select(-docid, -Content)
 
-zohuman <- rio::import(here::here("data", "coding ZO.xlsx")) %>%  select(-docid, -Content)
-
+##zohuman <- rio::import(here::here("data", "coding ZO.xlsx")) %>%  select(-docid, -Content)
 ## temp fix
-zohuman[29,] <- hjhuman[29,]
-zohuman[99,1] <- hjhuman[99,1]
-zohuman[79, 15] <- as.character(hjhuman[79, 15])
-zohuman[,15] <- as.numeric(zohuman[,15])
+## zohuman[29,] <- hjhuman[29,]
+## zohuman[99,1] <- hjhuman[99,1]
+## zohuman[79, 15] <- as.character(hjhuman[79, 15])
+## zohuman[,15] <- as.numeric(zohuman[,15])
+
+zohuman <- rio::import(here::here("data", "coding ZO (corrected).xlsx")) %>%  select(-docid, -Content)
 
 colnames(hjhuman) <- str_extract(colnames(hjhuman), "^[A-Z][0-9]")
 colnames(zohuman) <- str_extract(colnames(zohuman), "^[A-Z][0-9]")
@@ -55,7 +56,7 @@ possible_frames
 
 table(c("Responsibility", "Human Interest", "Conflict", "Morality", "Economic Consequences")[hj], frame_df$frame)
 
-str(varimax(loadings(factanal(~., 5, data = human)), normalize = FALSE))
+##str(varimax(loadings(factanal(~., 5, data = human)), normalize = FALSE))
 
 
 varm <- psych::principal(hjhuman, nfactors = 5, scores = TRUE)
@@ -91,6 +92,6 @@ tibble(desc = c("1 coder, avg", "1 coder, avg, binary", "1 coder, varimax", "two
 
 saveRDS(human_accuracy, ipath("human_accuracy.RDS"))
 
-human_accuracy %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment")+ labs(title = "Gold Standard") + theme_minimal() + theme(legend.position = "none") -> human_gg
+## human_accuracy %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.96 * se), lower = maxp - (1.96 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment")+ labs(title = "Gold Standard") + theme_minimal() + theme(legend.position = "none") -> human_gg
 
-ggsave(fpath("human_gg.png"), human_gg)
+## ggsave(fpath("human_gg.png"), human_gg)
