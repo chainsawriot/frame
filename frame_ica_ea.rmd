@@ -27,7 +27,7 @@ abstract: |
 keywords          : "frame, unsupervised method, topic model, semisupervised method, validity"
 wordcount         : "5876"
 
-bibliography      : "/home/chainsawriot/dev/dotfiles/bib.bib"
+bibliography      : "frame.bib"
 
 floatsintext      : yes
 linenumbers       : no
@@ -110,7 +110,7 @@ Therefore, for a method to sufficiently detect frames ---generic or not---, this
 
 After we have given the "obligatory nod" [@reese:2007:FP] to the framing literature, we propose our approach. In order to test whether a method can sufficiently detect frames, we need to have a dataset where the frames and topics are completely independent. But this dataset does not exist in reality. Also, there is no guarantee that manual coding, the so-called "gold standard" of frame detection [@nicholls:2020:CIM], can actually "reverse-engineer" communicative intentions as an audience member. Therefore, we need to synthesize a counterfactual dataset where frames (the package of selected aspects of perceived reality and communicative intention) are independent of topics all the way back to the communicative intention. The synthetic approach has been used by @clever:2020:ADN and @frischlich2022populists to solve a similar problem (evaluation of nostalgia detection).
 
-We randomly assigned 100 pairs of topics and frames (Table \@ref(tab:tab1)). The topics were "Ukraine", "corona", "tech companies", "climate" and "any topic". For the frames we used the generic frames following @semetko:2000:FE: "Attribution of responsibility", "Human interest", "Conflict", "Morality", und "(Economic) consequences". The topics and frames are independent (${\chi}^2$ = 17.7, df = 16, p = 0.34).
+We randomly assigned 100 pairs of topics and frames (Table \@ref(tab:tab1)). The topics were "Ukraine", "corona", "tech companies", "climate" and "any topic". For the frames we used the generic frames following @semetko:2000:FE : "Attribution of responsibility", "Human interest", "Conflict", "Morality", und "(Economic) consequences". The topics and frames are independent (${\chi}^2$ = 17.7, df = 16, p = 0.34).
 
 ```{r tab1}
 rio::import("Frame Corpus.xlsx") %>% tibble::as_tibble() -> frame_df
