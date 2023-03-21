@@ -14,7 +14,7 @@ fpath <- function(fname) {
 
 frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars = data.frame(frame = frame_df$frame))
 
-hjhuman <- rio::import(here::here("data", "coding HJ.xlsx")) %>%  select(-docid, -Content)
+hjhuman <- rio::import(here::here("data", "coding HJ.xlsx")) %>% select(-docid, -Content)
 
 ##zohuman <- rio::import(here::here("data", "coding ZO.xlsx")) %>%  select(-docid, -Content)
 ## temp fix
