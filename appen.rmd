@@ -14,7 +14,21 @@ print2 <- function(x, y, r2 = TRUE) {
         cat("$R^2$ = ", brms::bayes_R2(y)[1] , "\n\n")
     }
 }
+require(brms)
+require(ggplot2)
 ```
+
+
+## Comparing confidence level of correct and incorrect expert coding
+
+We modeled the correctness of expert coding ("F1" is equal to the ground truth) and confidence level ("F2"), while adjusting for individual differences between the two experts using Bayesian multilevel logistic regression analysis. The following is the robust conditional effect plot. There is no evidence to suggest that there is a trend. Therefore, experts can either confidently give correct and incorrect coding.
+
+```{r brms, fig.cap = "Robust conditional effects from the Bayesian model on the relationship between correction rate of expert coding and confidence at 89% credibility"}
+mod <- readRDS(here::here("intermediate/conf_mod.RDS"))
+plot(conditional_effects(mod, prob = 0.89, plot = FALSE), plot = FALSE) [[1]] +  xlab("Confidence") + ylab("Correction rate") + theme_minimal()
+```
+
+## Regression coefficients
 
 ```{r, results = "asis", echo = FALSE}
 print2("", readRDS(here::here("intermediate", "brms_mod.RDS")))
