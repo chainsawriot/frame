@@ -3,13 +3,9 @@
 For the whole analysis, you will need the following R packages
 
 ```r
-install.packages(c("combinat", "igraph", "lsa", "purrr", "quanteda", "rio", "seededlda", 
-"spacyr", "stm", "tibble", "keyATM", "brms", "tidyverse", "psych", 
+install.packages(c("combinat", "igraph", "lsa", "purrr", "quanteda", "rio", "seededlda",
+"udpipe", "stm", "tibble", "keyATM", "brms", "tidyverse", "psych", 
 "rmarkdown", "papaja", "parameters", "knitr", "here", "irr"))
-
-## setup spacyr
-require(spacyr)
-spacy_install()
 
 ## These are needed for the pressos
 ## c("chainsawriot/mzesalike" "xaringanExtra" "xaringan", "shiny")
