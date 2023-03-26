@@ -10,6 +10,10 @@ ipath <- function(fname) {
     here::here("intermediate", fname)
 }
 
+spath <- function(fname) {
+    here::here("intermediate/sim", fname)
+}
+
 .match_topics <- function(topics, frame_corpus) {
     possible_frames <- unique(docvars(frame_corpus)$frame)
     perm15 <- permn(seq_len(length(possible_frames)))

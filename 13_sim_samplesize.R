@@ -27,8 +27,8 @@ set.seed(1212121)
     lemmas <- udpipe(as.character(frame_corpus), udmodel_english)
     lemmas$doc_id <- factor(lemmas$doc_id, levels = seq(1, n))
     as.tokens(split(lemmas$lemma, lemmas$doc_id)) %>% tokens(remove_punct = TRUE, remove_numbers = TRUE, remove_separators = TRUE, remove_symbols = TRUE, split_hyphens = TRUE) %>% tokens_tolower() -> lemma_tokens
-    saveRDS(lemma_tokens, ipath(paste0("lemma_tokens_sim", n, ".RDS")))
-    saveRDS(frame_corpus, ipath(paste0("frame_corpus_sim", n, ".RDS")))
+    saveRDS(lemma_tokens, spath(paste0("lemma_tokens_sim", n, ".RDS")))
+    saveRDS(frame_corpus, spath(paste0("frame_corpus_sim", n, ".RDS")))
 }
 
 for (x in ns) {
