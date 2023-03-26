@@ -23,11 +23,12 @@ install.packages(c("papaja", "tidyverse", "brms", "knitr", "rio"))
 
 ```bash
 ## Spawning 10 threads
-make render -j 10 -B
+make all -j 10 -B
 ```
 
 Or just rendering the article
 
 ```bash
 make render
+make append
 ```

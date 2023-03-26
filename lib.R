@@ -84,7 +84,7 @@ experiment_antmn <- function(words, stopwords, trim, alpha, k_factor, normal_tok
     for (j in 1:5) {
         theta_sum[[j]] <- apply(theta[,which(reduced_trap == j), drop = FALSE], 1, sum)
     }
-    antmn_theta <- matrix(c(theta_sum[[1]], theta_sum[[2]], theta_sum[[3]], theta_sum[[4]], theta_sum[[5]]), nrow = 100, byrow = FALSE)
+    antmn_theta <- matrix(c(theta_sum[[1]], theta_sum[[2]], theta_sum[[3]], theta_sum[[4]], theta_sum[[5]]), nrow = ndoc(frame_corpus), byrow = FALSE)
     topic_antmn <- apply(antmn_theta, 1, which.max)
     .match_topics(topic_antmn, frame_corpus)
 }
@@ -104,3 +104,5 @@ experiment_keyatm <- function(words, stopwords, trim, alpha, expert, normal_toke
     topic_ka <- apply(tmod_ka$theta, 1, which.max)
     .match_topics(topic_ka, frame_corpus)
 }
+
+ns <- c(300, 500, 1000, 2000)
