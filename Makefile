@@ -1,3 +1,5 @@
+.PHONY: render
+
 render: frame.bib intermediate/LDA.RDS intermediate/STM.RDS intermediate/KM.RDS intermediate/PCA.RDS intermediate/ANTMN.RDS intermediate/SEEDED.RDS intermediate/KEYATM.RDS intermediate/expert_accuracy.RDS intermediate/brms_mod.RDS
 	Rscript -e "rmarkdown::render('frame_ica_ea.rmd')"
 	Rscript -e "rmarkdown::render('appen.rmd')"
@@ -15,8 +17,10 @@ intermediate/PCA.RDS: intermediate/lemma_tokens.RDS
 	Rscript 05_PCA.R
 intermediate/ANTMN.RDS: intermediate/lemma_tokens.RDS
 	Rscript 06_ANTMN.R
-intermediate/SEEDED.RDS intermediate/KEYATM.RDS: intermediate/lemma_tokens.RDS
-	Rscript 07_dictionary_methods.R
+intermediate/SEEDED.RDS: intermediate/lemma_tokens.RDS
+	Rscript 07_SEEDED.R
+intermediate/KEYATM.RDS: intermediate/lemma_tokens.RDS
+	Rscript 08_KEYATM.R
 intermediate/human_accuracy.RDS:
 	Rscript 09_human.R
 intermediate/expert_accuracy.RDS:

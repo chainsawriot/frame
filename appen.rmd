@@ -16,6 +16,8 @@ print2 <- function(x, y, r2 = TRUE) {
 }
 require(brms)
 require(ggplot2)
+require(tidyverse)
+require(cowplot)
 ```
 
 
@@ -32,4 +34,35 @@ plot(conditional_effects(mod, prob = 0.89, plot = FALSE), plot = FALSE) [[1]] + 
 
 ```{r, results = "asis", echo = FALSE}
 print2("", readRDS(here::here("intermediate", "brms_mod.RDS")))
+```
+
+## Simulation of increasing sample size
+
+### LDA
+
+```{r}
+ireadRDS <- function(fname) {
+    readRDS(here::here("intermediate", fname))
+}
+
+plotn_lda <- function(n) {
+    ireadRDS(paste0("LDA_sim", n, ".RDS")) %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / n), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> ldax
+    return(data.frame(x = seq(1, nrow(ldax)), n = n, maxp = sort(ldax$maxp)))
+}
+
+purrr::map_dfr(c(300, 500, 1000, 3000), plotn_lda) %>% mutate(n = factor(n, levels = c(300, 500, 1000, 3000))) %>% ggplot(aes(x = maxp, y = x, group = n, color = n)) + geom_line() + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + xlim(0, 0.6) + ylab("Treatment") + theme_minimal()
+
+
+##plot_grid(all_plots[[1]], all_plots[[2]], all_plots[[3]], all_plots[[4]], labels = c('300', '500', "1000", "3000"), ncol = 1)
+
+```
+
+### Seeded-LDA
+
+```{r}
+plotn_seeded <- function(n) {
+    ireadRDS(paste0("SEEDEDLDA_sim", n, ".RDS")) %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / n), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> seededx
+    return(data.frame(x = seq(1, nrow(seededx)), n = n, maxp = sort(seededx$maxp)))
+}
+purrr::map_dfr(c(300, 500, 1000, 3000), plotn_seeded) %>% mutate(n = factor(n, levels = c(300, 500, 1000, 3000))) %>% ggplot(aes(x = maxp, y = x, group = n, color = n)) + geom_line() + geom_vline(aes(xintercept = 0.2), alpha = 0.5, linetype = "dashed") + geom_vline(aes(xintercept = 0.3), alpha = 0.5, linetype = "dashed") + xlab(expression(CCR[max])) + xlim(0, 0.6) + ylab("Treatment") + theme_minimal()
 ```

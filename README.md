@@ -5,7 +5,8 @@ For the whole analysis, you will need the following R packages
 ```r
 install.packages(c("combinat", "igraph", "lsa", "purrr", "quanteda", "rio", "seededlda",
 "udpipe", "stm", "tibble", "keyATM", "brms", "tidyverse", "psych", 
-"rmarkdown", "papaja", "parameters", "knitr", "here", "irr"))
+"rmarkdown", "papaja", "parameters", "knitr", "here", "irr",
+"cowplot"))
 
 ## These are needed for the pressos
 ## c("chainsawriot/mzesalike" "xaringanExtra" "xaringan", "shiny")
@@ -16,5 +17,17 @@ If you just want to render the article:
 
 ```r
 install.packages(c("papaja", "tidyverse", "brms", "knitr", "rio"))
-rmarkdown::render('frame_ica_ea.rmd') ## or use the Makefile: make render
+```
+
+# Reproducing the entire analytical pipeline
+
+```bash
+## Spawning 10 threads
+make render -j 10 -B
+```
+
+Or just rendering the article
+
+```bash
+make render
 ```
