@@ -1,5 +1,6 @@
 ---
 title             : "A benchmark dataset for detecting frames in multi-topical news content: Online Appendix"
+floatsintext      : yes
 output:
  papaja::apa6_pdf:
    latex_engine: xelatex
@@ -18,51 +19,59 @@ require(brms)
 require(ggplot2)
 require(tidyverse)
 require(cowplot)
+source("lib.R")
 ```
-
-
-## Comparing confidence level of correct and incorrect expert coding
-
-We modeled the correctness of expert coding ("F1" is equal to the ground truth) and confidence level ("F2"), while adjusting for individual differences between the two experts using Bayesian multilevel logistic regression analysis. The following is the robust conditional effect plot. There is no evidence to suggest that there is a trend. Therefore, experts can either confidently give correct and incorrect coding.
-
-```{r brms, fig.cap = "Robust conditional effects from the Bayesian model on the relationship between correction rate of expert coding and confidence at 89% credibility"}
-mod <- readRDS(here::here("intermediate/conf_mod.RDS"))
-plot(conditional_effects(mod, prob = 0.89, plot = FALSE), plot = FALSE) [[1]] +  xlab("Confidence") + ylab("Correction rate") + theme_minimal()
-```
-
 ## Regression coefficients
 
 ```{r, results = "asis", echo = FALSE}
 print2("", readRDS(here::here("intermediate", "brms_mod.RDS")))
 ```
 
-## Simulation of increasing sample size
+## Comparing confidence level of correct and incorrect expert coding
 
-### LDA
+We modeled the correctness of expert coding ("F1" is equal to the ground truth) and confidence level ("F2"), while adjusting for individual differences between the two experts using Bayesian multilevel logistic regression analysis. The following is the robust conditional effect plot. There is no evidence to suggest that there is a trend. Therefore, experts can either confidently give correct and incorrect coding.
 
-```{r}
-ireadRDS <- function(fname) {
-    readRDS(here::here("intermediate", fname))
-}
-
-plotn_lda <- function(n) {
-    ireadRDS(paste0("LDA_sim", n, ".RDS")) %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / n), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> ldax
-    return(data.frame(x = seq(1, nrow(ldax)), n = n, maxp = sort(ldax$maxp)))
-}
-
-purrr::map_dfr(c(300, 500, 1000, 3000), plotn_lda) %>% mutate(n = factor(n, levels = c(300, 500, 1000, 3000))) %>% ggplot(aes(x = maxp, y = x, group = n, color = n)) + geom_line() + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + xlim(0, 0.6) + ylab("Treatment") + theme_minimal()
-
-
-##plot_grid(all_plots[[1]], all_plots[[2]], all_plots[[3]], all_plots[[4]], labels = c('300', '500', "1000", "3000"), ncol = 1)
-
+```{r brms1, fig.cap = "Robust conditional effects from the Bayesian model on the relationship between correction rate of expert coding and confidence at 89% credibility"}
+mod <- readRDS(here::here("intermediate/conf_mod.RDS"))
+plot(conditional_effects(mod, prob = 0.89, plot = FALSE), plot = FALSE) [[1]] +  xlab("Confidence") + ylab("Correction rate") + theme_minimal()
 ```
 
-### Seeded-LDA
+## Simulation of increasing sample size
 
-```{r}
-plotn_seeded <- function(n) {
-    ireadRDS(paste0("SEEDEDLDA_sim", n, ".RDS")) %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert), se = sqrt((maxp * (1 - maxp)) / n), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> seededx
-    return(data.frame(x = seq(1, nrow(seededx)), n = n, maxp = sort(seededx$maxp)))
+In this analysis, we simulated the possible outcome of increasing the sample size on the multiverse analysis.
+
+From our 100 articles, we created further synthetic articles following the principle of bootstrapping. We synthesized new article based on the following algorithm:
+
+1. Randomly select one article
+2. Tokenize this article into *n* sentences
+3. From these *n* sentences, randomly draw *n* sentences from these sentences with replacement. Therefore, one sentence can appear more than once.
+4. Concatenate these randomly drawn *n* sentences into a synthetic article, assign this article with the same topic and frame as the original article
+
+We repeat the above process for 500, 1000, and 2000 times to generate four different corpora. This approach is compatible with the bag-of-words representation used in all unsupervised and semi-supervised methods. Also in step 3, topical and frame clues have the same natural chance of being selected. To put this simulation in another perspective, it simulates whether frames, rather than topics, are more likely to be picked up by these unsupervised and semi-supervised methods when the sample size increases.
+
+```{r sim1, fig.cap = "Multiverse analyses with different sample sizes: 500, 1000, 2000"}
+sreadRDS <- function(method, n) {
+    readRDS(here::here("intermediate/sim", paste0(method, "_sim", n, ".RDS")))
 }
-purrr::map_dfr(c(300, 500, 1000, 3000), plotn_seeded) %>% mutate(n = factor(n, levels = c(300, 500, 1000, 3000))) %>% ggplot(aes(x = maxp, y = x, group = n, color = n)) + geom_line() + geom_vline(aes(xintercept = 0.2), alpha = 0.5, linetype = "dashed") + geom_vline(aes(xintercept = 0.3), alpha = 0.5, linetype = "dashed") + xlab(expression(CCR[max])) + xlim(0, 0.6) + ylab("Treatment") + theme_minimal()
+
+plotn <- function(method, n) {
+    sreadRDS(method, n) %>% mutate(maxp = map_dbl(res, max)) -> ldax
+    return(data.frame(x = seq(1, nrow(ldax)), method = method, n = n, maxp = sort(ldax$maxp)))
+}
+
+methods <- c("KM", "PCA", "LDA", "STM", "ANTMN", "SEEDED", "KEYATM")
+conditions <- expand.grid(ns, methods)
+
+purrr::map2_dfr(conditions$Var2, conditions$Var1, plotn) %>% mutate(n = factor(n, levels = ns)) %>% ggplot(aes(x = maxp, y = x, group = n, color = n)) + geom_line() + geom_vline(aes(xintercept = 0.2), alpha = 0.5, linetype = "dashed") + geom_vline(aes(xintercept = 0.3), alpha = 0.5, linetype = "dashed") + xlab(expression(CCR[max])) + xlim(0, 0.6) + ylab("Treatment") + facet_wrap(facets = vars(method), nrow = 3, scales = "free_y") + theme_minimal()
+```
+
+From this simulation, there is highly unlikely that increasing the sample size would increase the correct classification rate for all unsupervised methods. Instead, all methods, except STM, perform more like the de-facto null (0.3) with the increasing sample size. Therefore, these methods appear to be more keen to pick up **topics**, rather than frames, when sample size increases. It reflects by the performance curve rescinding towards the null value with the highest sample size. For the two semi-supervised methods, increasing the sample size appears to provide better resistance against the rescinding towards the null value.
+
+We also performed the same Bayesian analysis using the simulated data. By increasing the sample size, it appears that both H1 and H2 would become more significant, instead of the other way around.
+
+```{r simbrms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semisupervised and automatic methods at 89% credibility with different simulated sample sizes"}
+p1 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim500.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+p2 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim1000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+p3 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim2000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+plot_grid(p1, p2, p3, labels = c('500', '1000', '2000'), ncol = 1)
 ```

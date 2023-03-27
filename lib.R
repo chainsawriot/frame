@@ -109,4 +109,4 @@ experiment_keyatm <- function(words, stopwords, trim, alpha, expert, normal_toke
     .match_topics(topic_ka, frame_corpus)
 }
 
-ns <- c(300, 500, 1000, 2000)
+ns <- c(500, 1000, 2000)

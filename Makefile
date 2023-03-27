@@ -4,7 +4,7 @@ all: render appen
 
 render: frame.bib intermediate/LDA.RDS intermediate/STM.RDS intermediate/KM.RDS intermediate/PCA.RDS intermediate/ANTMN.RDS intermediate/SEEDED.RDS intermediate/KEYATM.RDS intermediate/expert_accuracy.RDS intermediate/brms_mod.RDS
 	Rscript -e "rmarkdown::render('frame_ica_ea.rmd')"
-appen: intermediate/conf_mod.RDS
+appen: intermediate/conf_mod.RDS intermediate/sim/brms_mod_sim2000.RDS
 	Rscript -e "rmarkdown::render('appen.rmd')"
 frame.bib:
 	bibcon -b /home/chainsawriot/dev/dotfiles/bib.bib -o frame.bib frame_ica_ea.rmd
@@ -30,21 +30,22 @@ intermediate/expert_accuracy.RDS:
 	Rscript 10_expert.R
 intermediate/brms_mod.RDS: intermediate/LDA.RDS intermediate/STM.RDS intermediate/KM.RDS intermediate/PCA.RDS intermediate/ANTMN.RDS intermediate/SEEDED.RDS intermediate/KEYATM.RDS intermediate/human_accuracy.RDS
 	Rscript 11_regression.R
-intermediate/sim/lemma_tokens_sim300.RDS:
+intermediate/sim/lemma_tokens_sim2000.RDS:
 	Rscript 13_sim_samplesize.R
-intermediate/sim/LDA_sim2000.RDS: intermediate/sim/lemma_tokens_sim300.RDS
+intermediate/sim/LDA_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 	Rscript 14_sim_LDA.R
-intermediate/sim/STM_sim2000.RDS: intermediate/sim/lemma_tokens_sim300.RDS
+intermediate/sim/STM_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 	Rscript 14_sim_STM.R
-intermediate/sim/KM_sim2000.RDS: intermediate/sim/lemma_tokens_sim300.RDS
+intermediate/sim/KM_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 	Rscript 14_sim_KM.R
-intermediate/sim/PCA_sim2000.RDS: intermediate/sim/lemma_tokens_sim300.RDS
+intermediate/sim/PCA_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 	Rscript 14_sim_PCA.R
-intermediate/sim/ANTMN_sim2000.RDS: intermediate/sim/lemma_tokens_sim300.RDS
+intermediate/sim/ANTMN_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 	Rscript 14_sim_ANTMN.R
-intermediate/sim/SEEDED_sim2000.RDS: intermediate/sim/lemma_tokens_sim300.RDS
+intermediate/sim/SEEDED_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 	Rscript 14_sim_SEEDED.R
-intermediate/sim/KEYATM_sim2000.RDS: intermediate/sim/lemma_tokens_sim300.RDS
+intermediate/sim/KEYATM_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 	Rscript 14_sim_KEYATM.R
-simulate: intermediate/sim/LDA_sim2000.RDS intermediate/sim/STM_sim2000.RDS intermediate/sim/KM_sim2000.RDS intermediate/sim/PCA_sim2000.RDS intermediate/sim/ANTMN_sim2000.RDS intermediate/sim/SEEDED_sim2000.RDS intermediate/sim/KEYATM_sim2000.RDS
-	echo "Doing simuation, it takes ages. Come back tommorrow!"
+intermediate/sim/brms_mod_sim2000.RDS: intermediate/sim/LDA_sim2000.RDS intermediate/sim/STM_sim2000.RDS intermediate/sim/KM_sim2000.RDS intermediate/sim/PCA_sim2000.RDS intermediate/sim/ANTMN_sim2000.RDS intermediate/sim/SEEDED_sim2000.RDS intermediate/sim/KEYATM_sim2000.RDS
+	echo "Simulation done. It took ages."
+	Rscript 15_sim_brms.R
