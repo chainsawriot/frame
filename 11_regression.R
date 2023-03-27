@@ -23,7 +23,7 @@ require(brms)
 weaklyinformative_prior <- c(prior_string("normal(0, 1)", class = "b"), prior_string("normal(0, 1)", class = "Intercept"))
 
 set.seed(12111111)
-mod <- brm(maxp~method_type+ (1 | method), data = all_uni, control = list(adapt_delta = 0.99, max_treedepth = 15), core = 6, prior = weaklyinformative_prior)
+mod <- brm(maxp~method_type+ (1 | method), data = all_uni, control = list(adapt_delta = 0.99, max_treedepth = 15), core = 6, prior = weaklyinformative_prior, seed  = 1211111)
 saveRDS(mod, here::here("intermediate", "brms_mod.RDS"))
 
 ## set.seed(1211)
