@@ -8,7 +8,7 @@ The exploratory expert coding started on January 30, 2023 (after the analysis of
 
 # Deviations from preregistration
 
-As reported in the article, the exploratory expert coding was not preregistered and therefore not considered in the main analysis.
+As reported in the article, the exploratory expert coding was not preregistered and therefore not considered in the main analysis. The simulation study was not preregistered also.
 
 The following are the deviations from the preregistration: [https://doi.org/10.17605/OSF.IO/SY6JX](https://doi.org/10.17605/OSF.IO/SY6JX).
 
@@ -34,7 +34,7 @@ Because of these changes, we reworded the original H1b, H2, and H3 in the paper:
 
 ### Measured variables
 
-1. We decided not to use F1, precision, and recall because these values makes different assumptions about the distribution of correct and incorrect classifications. Instead we opted for $$CCR_{max}$$, an assumption-free measurement.
+1. We decided not to use F1, precision, and recall because these values makes different assumptions about the distribution of correct and incorrect classifications. Instead we opted for $CCR_{max}$, an assumption-free measurement.
 
 ##  Analysis Plan
 
