@@ -188,7 +188,7 @@ ireadRDS("KM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate
 kmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
 
-Figure \@ref(fig:km) shows the result of multiverse analysis of the frame detection method proposed by @burscher:2016:FBW. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in in `r as.integer((sum(kmx$lower < 0.3) / nrow(kmx)) * 100)`\% of the combinations of methodological decisions.
+Figure \@ref(fig:km) shows the result of multiverse analysis of the frame detection method proposed by @burscher:2016:FBW. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(kmx$lower < 0.3) / nrow(kmx)) * 100)`\% of the combinations of methodological decisions.
 
 ### Principal Component Analysis + TF-IDF
 
@@ -218,7 +218,7 @@ ireadRDS("STM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutat
 stmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
 
-Figure \@ref(fig:stm) shows the result of multiverse analysis of the frame detection method proposed by @nicholls:2020:CIM. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in in `r as.integer((sum(stmx$lower < 0.3) / nrow(stmx)) * 100)`\% of the combinations of methodological decisions.
+Figure \@ref(fig:stm) shows the result of multiverse analysis of the frame detection method proposed by @nicholls:2020:CIM. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(stmx$lower < 0.3) / nrow(stmx)) * 100)`\% of the combinations of methodological decisions.
 
 ### ANTMN
 

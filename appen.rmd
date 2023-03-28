@@ -27,6 +27,33 @@ source("lib.R")
 print2("", readRDS(here::here("intermediate", "brms_mod.RDS")))
 ```
 
+## Visualization of the variance
+
+```{r, message = FALSE, echo = FALSE}
+ireadRDS <- function(fname) {
+    readRDS(here::here("intermediate", fname))
+}
+
+bind_rows(mutate(ireadRDS("KM.RDS"), method = "km"),
+          mutate(ireadRDS("PCA.RDS"), method = "pca"),
+          mutate(ireadRDS("LDA.RDS"), method = "lda"),
+          mutate(ireadRDS("STM.RDS"), method = "stm"),
+          mutate(ireadRDS("ANTMN.RDS"), method = "antmn"),
+          mutate(ireadRDS("SEEDED.RDS"), method = "seededlda"),
+          mutate(ireadRDS("KEYATM.RDS"), method = "keyATM")) %>%
+    mutate(maxp = map_dbl(res, max)) %>% mutate(method = factor(method)) %>% mutate(method = fct_relevel(method, "km")) -> all_uni
+
+human <- ireadRDS("human_accuracy.RDS") %>% mutate(method = "gold")
+
+all_uni %>% bind_rows(human) %>% mutate(method_type = case_when(method == "gold" ~ 0,
+                           method %in% c("keyATM", "seededlda") ~ 1,
+                           TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
+##var(all_uni$maxp[all_uni$method_type == "Automatic"])
+##var(all_uni$maxp[all_uni$method_type == "Semisupervised"])
+
+all_uni %>% filter(!method_type %in% c("Gold")) %>% ggplot(aes(y = maxp, x = method)) + geom_dotplot(binaxis='y', stackdir='center', dotsize=0.2) + facet_grid(cols = vars(method_type), scales = "free_x") + theme_minimal() + theme(legend.position = "none") + ylab(expression(CCR[max]))
+```
+
 ## Comparing confidence level of correct and incorrect expert coding
 
 We modeled the correctness of expert coding ("F1" is equal to the ground truth) and confidence level ("F2"), while adjusting for individual differences between the two experts using Bayesian multilevel logistic regression analysis. The following is the robust conditional effect plot. There is no evidence to suggest that there is a trend. Therefore, experts can either confidently give correct and incorrect coding.

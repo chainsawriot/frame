@@ -14,7 +14,7 @@ The following are the deviations from the preregistration: [https://doi.org/10.1
 
 ## Hypotheses
 1. The "manual deductive method" (Mattes & Kohring 2008) was not studied due to funding issues. Therefore, the preregistered H1a was not studied.
-2. H4 was not studied because we don't know how to operationalize the main variable ("more likely to be affected").
+2. H4 was not studied because we don't know how to operationalize the main variable ("more likely to be affected"). If the likelihood to be affected is quantified by the variance of $CCR_{max}$, a visualization is presented in the Online Appendix. It seems that some automatic methods (e.g. ANTMN) produce a much higher variance of $CCR_{max}$.
 3. H5 and the whole idea of cost effectiveness were not studied due to fact that it is difficult to estimate the time used by the programmer (PhD, 1st author) for programming.
 
 Because of these changes, we reworded the original H1b, H2, and H3 in the paper:
