@@ -260,7 +260,7 @@ Figure \@ref(fig:human) shows the result of multiverse analysis of the "Gold Sta
 bind_rows(ireadRDS("expert_accuracy.RDS"), ireadRDS("human_accuracy.RDS")) %>% mutate(expert = c(rep(TRUE, 7), rep(FALSE, 5))) %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), col = expert, xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_manual(values = c("#000000", "#BBBBBB")) +  theme_minimal() + theme(legend.position = "none")
 ```
 
-The above analysis also reveals that not enough evidence to show that using experts instead of trained coders increases the accuracy. The same can be said about coding frame elements and coding frame as a single item. In the online appendix ([https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a](https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a)), a comparison of confidence level of the expert coders between correct and incorrect answers is presented. Experts could give incorrect answers confidently.
+The above analysis also reveals that not enough evidence to show that using experts instead of trained coders increases the accuracy. The same can be said about coding frame elements and coding frame as a single item. In the online appendix <!-- ([https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a](https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a)) -->, a comparison of confidence level of the expert coders between correct and incorrect answers is presented. Experts could give incorrect answers confidently.
 
 ## Comparison of methods
 
@@ -290,7 +290,7 @@ For the second implication, this study has no say about the equivalence among me
 
 Another issue with the sample size is that automatic and semi-supervised methods studied in this benchmark might not work well with a sample size of 100 as these methods were not designed to work this relatively small sample size. In the online appendix, an analysis is presented to simulate the possible impact of increasing the sample size on H1 and H2. Our simulation points to the direction that both H1 and H2 are more likely to be supported when the sample size increases. H3, however, might be less likely to be supported. Therefore, automatic methods such as ANTMN are more likely to detect **topics** rather than frames when the sample size increases. But we maintain that this finding needs to be confirmed with actual data in a new empirical study.
 
-Despite all the limitations, we provided a benchmark dataset for evaluating frame detection methods (available here: [https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a](https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a)) and benchmarked various methods with it. The finding from this paper casts doubt on the validity of using automatic inductive methods to detect frames.
+Despite all the limitations, we provided a benchmark dataset for evaluating frame detection methods <!-- (available here: [https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a](https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a)) --> and benchmarked various methods with it. The finding from this paper casts doubt on the validity of using automatic inductive methods to detect frames.
 
 \newpage
 
