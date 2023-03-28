@@ -47,7 +47,7 @@ From our 100 articles, we created further synthetic articles following the princ
 3. From these *n* sentences, randomly draw *n* sentences from these sentences with replacement. Therefore, one sentence can appear more than once.
 4. Concatenate these randomly drawn *n* sentences into a synthetic article, assign this article with the same topic and frame as the original article
 
-We repeat the above process for 500, 1000, and 2000 times to generate four different corpora. This approach is compatible with the bag-of-words representation used in all unsupervised and semi-supervised methods. Also in step 3, topical and frame clues have the same natural chance of being selected. To put this simulation in another perspective, it simulates whether frames, rather than topics, are more likely to be picked up by these unsupervised and semi-supervised methods when the sample size increases.
+We repeat the above process for 500, 1000, and 2000 times to generate 3 different corpora. This approach is compatible with the bag-of-words representation used in all unsupervised and semi-supervised methods because the word order is not considered. Also in step 3, topical and frame clues have the same natural chance of being selected. To put this simulation in another perspective, it simulates whether frames, rather than topics, are more likely to be picked up by these unsupervised and semi-supervised methods when the sample size increases.
 
 ```{r sim1, fig.cap = "Multiverse analyses with different sample sizes: 500, 1000, 2000"}
 sreadRDS <- function(method, n) {
@@ -69,7 +69,7 @@ From this simulation, there is highly unlikely that increasing the sample size w
 
 We also performed the same Bayesian analysis using the simulated data. By increasing the sample size, it appears that both H1 and H2 would become more significant, instead of the other way around.
 
-```{r simbrms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semisupervised and automatic methods at 89% credibility with different simulated sample sizes"}
+```{r simbrms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semi-supervised and automatic methods at 89% credibility with different simulated sample sizes"}
 p1 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim500.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
 p2 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim1000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
 p3 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim2000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")

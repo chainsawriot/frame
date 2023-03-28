@@ -22,9 +22,9 @@ authornote: |
   The anonymized link to the online appendix of this submission: https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a. The authors would like to thank 1) Valerie Hase (Ludwig-Maximilians-Universität München) for providing keywords to be used in this study, 2) Open Science Office, University of Mannheim, for the financial support, and 3) student assistants: Filippo Borsato, Hannah Erb, Hyosun Jang, Fatih Ozhasar, Zeynep Özgülec, and Jonathan Vincent.
 
 abstract: |
-  Frames are a central concept in communication research. Based on our literature review, we propose that frame detection is an act of detecting selected reality and communicative intention. We then highlight the conceptual and methodological issues of frame detection using computational methods. Due to the correlation between topics and frames, we provide a synthetic benchmark dataset for evaluating frames found in multi-topical news content. For the first time, the current study is able to benchmark manual coding and various automatic and semisupervised methods using this synthetic benchmark dataset. Based on the benchmark results, this study casts doubt on the validity of frame detection using automatic inductive methods such as Structural Topic Models (STM) and Analysis of Topic Model Networks (ANTMN).
+  Frames are a central concept in communication research. Based on our literature review, we propose that frame detection is an act of detecting selected reality and communicative intention. We then highlight the conceptual and methodological issues of frame detection using computational methods. Due to the correlation between topics and frames, we provide a synthetic benchmark dataset for evaluating frames found in multi-topical news content. For the first time, the current study is able to benchmark manual coding and various automatic and semi-supervised methods using this synthetic benchmark dataset. Based on the benchmark results, this study casts doubt on the validity of frame detection using automatic inductive methods such as Structural Topic Models (STM) and Analysis of Topic Model Networks (ANTMN).
   
-keywords          : "frame, unsupervised method, topic model, semisupervised method, validity"
+keywords          : "frame, unsupervised method, topic model, semi-supervised method, validity"
 wordcount         : "5876"
 
 bibliography      : "frame.bib"
@@ -138,9 +138,9 @@ We selected different methods and attempted to detect the frames in those 100 mu
 
 All automatic methods that have been claimed of being able to detect frames were investigated. This includes k-Means with TF-IDF [@burscher:2016:FBW], Principal Component Analysis with TF-IDF [@greussing:2017:S], LDA [@dimaggio:2013:E], STM [@nicholls:2020:CIM], and Topic Model Networks [@walter:2019:NFA]. The number of clusters to find (k) was five.
 
-## Semisupervised methods
+## Semi-supervised methods
 
-We also investigated semisupervised methods. This consists of Seeded-LDA [@watanabe:2020:TDA] and Keyword Assisted Topic Model [keyATM, @eshima2020keyatm]. It is important to clarify that the authors of these methods do not claim that their semisupervised methods can be used for detecting frames. But both methods are claimed to be able to measure theoretical constructs through the provision of theory-driven dictionaries. These methods were included for exploratory purposes only. To apply these methods, we needed dictionaries that should be able to find the five generic frames. Before data collection, we surveyed two experts of journalism studies and pre-registered the dictionaries they suggested.
+We also investigated semi-supervised methods. This consists of Seeded-LDA [@watanabe:2020:TDA] and Keyword Assisted Topic Model [keyATM, @eshima2020keyatm]. It is important to clarify that the authors of these methods do not claim that their semi-supervised methods can be used for detecting frames. But both methods are claimed to be able to measure theoretical constructs through the provision of theory-driven dictionaries. These methods were included for exploratory purposes only. To apply these methods, we needed dictionaries that should be able to find the five generic frames. Before data collection, we surveyed two experts of journalism studies and pre-registered the dictionaries they suggested.
 
 ## The "gold standard"
 
@@ -230,7 +230,7 @@ antmnx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper
 
 Figure \@ref(fig:antmn) shows the result of multiverse analysis of the frame detection method proposed by @walter:2019:NFA. There is not enough evidence to support that the method can deliver significantly better or worse performance than null in `r as.integer((sum(antmnx$lower < 0.3) / nrow(antmnx)) * 100)`\% of the combinations of methodological decisions.
 
-## Semisupervised methods
+## Semi-supervised methods
 
 ### Seeded-LDA
 
@@ -264,19 +264,19 @@ The above analysis also reveals that not enough evidence to show that using expe
 
 ## Comparison of methods
 
-We modeled the $CCR_{max}$ from different methodological combinations of all methods using Bayesian multilevel regression [@burkner2017advanced]. Figure \@ref(fig:brms) shows the robust conditional effects of the gold standard, semisupervised, and automatic inductive methods on $CCR_{max}$ at 89\% credibility [@mcelreath2020statistical]. The regression coefficients are available in the online appendix. We repeated here that the not pre-registered expert coding has been excluded in this analysis.
+We modeled the $CCR_{max}$ from different methodological combinations of all methods using Bayesian multilevel regression [@burkner2017advanced]. Figure \@ref(fig:brms) shows the robust conditional effects of the gold standard, semi-supervised, and automatic inductive methods on $CCR_{max}$ at 89\% credibility [@mcelreath2020statistical]. The regression coefficients are available in the online appendix. We repeated here that the not pre-registered expert coding has been excluded in this analysis.
 
-The regression model suggests that the automatic methods have a significantly lower accuracy than the "gold standard". This supports H1. However, there is no meaning difference between the automatic methods and semisupervised methods, as well as between semisupervised methods and "gold standard". There is not enough evidence to support H2 and H3.
+The regression model suggests that the automatic methods have a significantly lower accuracy than the "gold standard". This supports H1. However, there is no meaningful difference between the automatic methods and semi-supervised methods, as well as between semi-supervised methods and "gold standard". There is not enough evidence to support H2 and H3.
 
-```{r brms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semisupervised and automatic methods at 89% credibility"}
+```{r brms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semi-supervised and automatic methods at 89% credibility"}
 plot(conditional_effects(ireadRDS("brms_mod.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
 ```
 
 # Discussion
 
-Based on our review of the framing literature, we provide a synthetic benchmark dataset for frame detection where frames and topics are independent. Using what we called the "platinum standard" dataset, we evaluated methods claimed to be able to detect frames inductively [@burscher:2016:FBW;@greussing:2017:S;@nicholls:2020:CIM;@walter:2019:NFA], as well as two semisupervised methods [@watanabe:2020:TDA;@eshima2020keyatm] and the "gold standard" [@semetko:2000:FE].
+Based on our review of the framing literature, we provide a synthetic benchmark dataset for frame detection where frames and topics are independent. Using what we called the "platinum standard" dataset, we evaluated methods claimed to be able to detect frames inductively [@burscher:2016:FBW;@greussing:2017:S;@nicholls:2020:CIM;@walter:2019:NFA], as well as two semi-supervised methods [@watanabe:2020:TDA;@eshima2020keyatm] and the "gold standard" [@semetko:2000:FE].
 
-Using the multiverse analytic approach [@pipal:2022:IYH], we exhaustively benchmarked all methods, irrespective of methodological choices, and reported their "best case" performance. Our benchmark casts doubt on the validity of the so-called "frames" detected by all inductive methods (H1). The conditional effect for all of these inductive methods in figure \@ref(fig:brms) crosses the *de facto* null value of 0.3, which assumes the detected topics are shoehorned in as an indicator of "frames''. Also, there is no evidence to suggest that the provision of theory-driven dictionaries to those inductive methods can improve the performance (H2) from other automatic inductive counterparts, although the performance of these semisupervised methods appears to be better than the *de facto* null (Figure \@ref(fig:brms)).
+Using the multiverse analytic approach [@pipal:2022:IYH], we exhaustively benchmarked all methods, irrespective of methodological choices, and reported their "best case" performance. Our benchmark casts doubt on the validity of the so-called "frames" detected by all inductive methods (H1). The conditional effect for all of these inductive methods in figure \@ref(fig:brms) crosses the *de facto* null value of 0.3, which assumes the detected topics are shoehorned in as an indicator of "frames''. Also, there is no evidence to suggest that the provision of theory-driven dictionaries to those inductive methods can improve the performance (H2) from other automatic inductive counterparts, although the performance of these semi-supervised methods appears to be better than the *de facto* null (Figure \@ref(fig:brms)).
 
 For the first time also, the current study is able to benchmark the "gold standard". Although the "gold standard" performs significantly better than null, the performance is not superb (Figure \@ref(fig:human)). There have been concerns about the reliability issues of @semetko:2000:FE's coding scheme [e.g. @kroon:2022:BCW]. But the less-than-superb performance cannot be explained by intercoder variations alone because the multiverse analysis has considered both the single- and double-coder scenarios. This low performance is not what we expected. But this unexpected finding is also thought-provoking: Given the fact that the "gold standard" can only detect 50\% of frames correctly and the state-of-the-art supervised classifiers classify frames at around 60\% accuracy, should we trust the supervised frame classifiers trained on the so-called "gold standard" data [e.g. @kroon:2022:BCW;@liu2019detecting;@kwak2020systematic]? 
 
