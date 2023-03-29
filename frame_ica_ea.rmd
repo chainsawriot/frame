@@ -123,7 +123,8 @@ rio::import(here::here("data", "Frame Corpus.xlsx")) %>% tibble::as_tibble() -> 
 frame_df$frame[frame_df$frame == "Economic Consequences"] <- "Conseq."
 frame_df$frame[frame_df$frame == "Human Interest"] <- "Hum. Int."
 frame_df$frame[frame_df$frame == "Responsibility"] <- "Resp."
-knitr::kable(as.matrix(table(frame_df$topic, frame_df$frame)), caption = "Distribution of topics and frames")
+frame_df %>% group_by(topic, frame) %>% summarise(n = n()) %>% spread(frame, n) %>% ungroup %>%
+    papaja::apa_table(caption = "Distribution of topics and frames")
 ```
 
 We gave these frame-topic pairs to four authors [political science master students with prior knowledge concerning framing theory and generic frames @semetko:2000:FE] as stimuli and instructed them to write news articles containing the assigned topics and frames. These authors were also randomly paired up to edit the articles written by their peers to ensure the articles were actually conveying the assigned topics or frames.
