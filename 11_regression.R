@@ -30,3 +30,5 @@ saveRDS(mod, here::here("intermediate", "brms_mod.RDS"))
 
 ## all_uni %>% filter(method_type != "Gold") %>% brm(maxp~method_type+ (1 | method), data = .,control = list(adapt_delta = 0.9), core = 6, prior = weaklyinformative_prior) -> mod2
 ## saveRDS(mod2, here::here("intermediate", "brms_mod2.RDS"))
+
+##mod <- brm(maxp~method_type+words+stopwords+trim+alpha+(1 | method), data = all_uni, control = list(adapt_delta = 0.99, max_treedepth = 15), core = 6, prior = weaklyinformative_prior, seed  = 1211111)
