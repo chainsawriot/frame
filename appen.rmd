@@ -21,7 +21,7 @@ require(tidyverse)
 require(cowplot)
 source("lib.R")
 ```
-## Regression coefficients
+## Regression coefficients of the Bayesian model
 
 ```{r, results = "asis", echo = FALSE}
 print2("", readRDS(here::here("intermediate", "brms_mod.RDS")))
@@ -67,10 +67,10 @@ plot(conditional_effects(mod, prob = 0.89, plot = FALSE), plot = FALSE) [[1]] + 
 
 In this analysis, we simulated the possible outcome of increasing the sample size on the multiverse analysis.
 
-From our 100 articles, we created further synthetic articles following the principle of bootstrapping. We synthesized new article based on the following algorithm:
+From our 100 articles, we created further synthetic articles following the principle of bootstrapping. We synthesized more articles based on the following algorithm:
 
 1. Randomly select one article
-2. Tokenize this article into *n* sentences
+2. Tokenize this article into its *n* sentences
 3. From these *n* sentences, randomly draw *n* sentences from these sentences with replacement. Therefore, one sentence can appear more than once.
 4. Concatenate these randomly drawn *n* sentences into a synthetic article, assign this article with the same topic and frame as the original article
 
@@ -92,7 +92,9 @@ conditions <- expand.grid(ns, methods)
 purrr::map2_dfr(conditions$Var2, conditions$Var1, plotn) %>% mutate(n = factor(n, levels = ns)) %>% ggplot(aes(x = maxp, y = x, group = n, color = n)) + geom_line() + geom_vline(aes(xintercept = 0.2), alpha = 0.5, linetype = "dashed") + geom_vline(aes(xintercept = 0.3), alpha = 0.5, linetype = "dashed") + xlab(expression(CCR[max])) + xlim(0, 0.6) + ylab("Treatment") + facet_wrap(facets = vars(method), nrow = 3, scales = "free_y") + theme_minimal()
 ```
 
-From this simulation, there is highly unlikely that increasing the sample size would increase the correct classification rate for all unsupervised methods. Instead, all methods, except STM, perform more like the de-facto null (0.3) with the increasing sample size. Therefore, these methods appear to be more keen to pick up **topics**, rather than frames, when sample size increases. It reflects by the performance curve rescinding towards the null value with the highest sample size. For the two semi-supervised methods, increasing the sample size appears to provide better resistance against the rescinding towards the null value.
+The above figure shows the sorted $CCR_{max}$ like the visualization of multiverse in the main text. All confidence intervals have been stripped for clarity as we are only interested in the point estimate. The treatments are the same as the main analysis and they are not displayed in the y-axes.
+
+From this simulation, it is extremely unlikely that increasing the sample size would increase the $CCR_{max}$ for all unsupervised methods. Instead, all methods, except KM and STM, perform more like the de-facto null (0.3) with the increasing sample size. Therefore, these methods appear to be more keen to pick up **topics**, rather than frames, when sample size increases: the sorted performance curve rescinding towards the null value with the highest sample size. For the two semi-supervised methods, increasing the sample size appears to provide better resistance against the rescinding.
 
 We also performed the same Bayesian analysis using the simulated data. By increasing the sample size, it appears that both H1 and H2 would become more significant, instead of the other way around.
 
