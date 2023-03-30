@@ -40,7 +40,7 @@ Because of these changes, we reworded the original H1b, H2, and H3 in the paper:
 
 ### Statistical models
 
-1. We were no aware of some additional preprocessing steps for two methods at the time of preregistration. These steps were added to the multiverse analysis.
+1. We were not aware of some additional preprocessing steps for two methods at the time of preregistration. These steps were added to the multiverse analysis.
    1. For ANTMN, there is a need to extract a larger number of topics by LDA before the network analysis. In the original implementation, there is no indication of how large this number should be. We decided to introduce a variable called "K Factor" (*Kf*). When k = 5, the number of topics to be extracted by LDA is k * Kf. In the multiverse analysis, we considered *Kf* of 2, 3, and 4.
    2. For the manual deductive method, published papers using the coding scheme (Semetko & Valkenburg) use different methods to combine the frame elements. We considered also the variation in this aspect: averaging, factor analysis, and binary categorization.
 2. We did not consider a preregistered decision:
