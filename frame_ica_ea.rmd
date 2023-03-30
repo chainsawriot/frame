@@ -1,5 +1,5 @@
 ---
-title             : "A counterfactual dataset for evaluating frames found in multi-topical news content"
+title             : "A counterfactual dataset for detecting frames in multi-topical news content"
 shorttitle        : "FRAME DETECTION"
 author: 
   - name          : "Chung-hong Chan"
@@ -25,7 +25,7 @@ abstract: |
   Frames are a central concept in communication research. Based on our literature review, we propose that frame detection is an act of detecting selected reality and communicative intention. We then highlight the conceptual and methodological issues of frame detection using computational methods. Due to the correlation between topics and frames, we provide a synthetic counterfactual dataset for evaluating frames found in multi-topical news content. For the first time, the current study is able to benchmark manual coding and various automatic and semi-supervised methods using this synthetic dataset. Based on the benchmark results, this study casts doubt on the validity of frame detection using automatic inductive methods such as Structural Topic Models (STM) and Analysis of Topic Model Networks (ANTMN).
   
 keywords          : "frame, unsupervised method, topic model, semi-supervised method, validity"
-wordcount         : "5876"
+wordcount         : "6797"
 
 bibliography      : "frame.bib"
 
