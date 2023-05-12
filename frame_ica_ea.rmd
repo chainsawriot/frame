@@ -1,5 +1,5 @@
 ---
-title             : "A counterfactual dataset for evaluting frame detection methods in multi-topical news content"
+title             : "A counterfactual dataset for evaluating frame detection methods in multi-topical news content"
 shorttitle        : "FRAME DETECTION"
 author: 
   - name          : "Chung-hong Chan"

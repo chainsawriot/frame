@@ -1,0 +1,226 @@
+---
+title: "A counterfactual dataset"
+subtitle: "Frame Detection"
+author: Chung-hong Chan
+institute: GESIS
+date: today
+date-format: "YYYY-MM-DD"
+footer: "@chainsawriot@emac.ch"
+embed-resources: true
+format: fakegesis-revealjs
+---
+
+## Title
+
+~~Frame? Kein Thema! Die Validität der induktiven Frame-Erkennung in Texten mit mehreren Themen~~
+
+A counterfactual dataset for evaluating frame detection methods in multi-topical news content
+
+* Chung-hong Chan
+* Rainer Freudenthaler
+* Philipp Müller
+
+::: {.notes}
+What I wanted to say is: The German title is better.
+:::
+
+## Acknowledgement
+
+The authors would like to thank the Open Science Office, University of Mannheim for the financial support of this project.
+
+More infomation: [https://www.uni-mannheim.de/open-science/open-science-office/](https://www.uni-mannheim.de/open-science/open-science-office/)
+
+Also Valerie Hase (LMU Munich), and the following student helpers: Filippo Borsato, Hannah Erb, Hyosun Jang, Fatih Ozhasar, Zeynep Özgülec, and Jonathan Vincent.
+
+::: {.notes}
+$$$
+:::
+
+## The current state of framing literature
+
+"Some studies employ the concept only in a metaphoric sense, whereas others reduce frames to story topics, attributes, or issue position"
+
+::: {style="font-size: 0.3em"}
+Carragee & Roefs (2004)
+:::
+
+"(Framing researchers) give an obligatory nod to the literature before proceeding to do whatever they were going to do in the first place."
+
+::: {style="font-size: 0.3em"}
+Reese (2007)
+:::
+
+## What's a frame?
+
+**Entmanian Frame:** "Select some aspects of a perceived reality and make them more salient in a communicating text, in such a way as to promote a particular problem definition, causal interpretation, moral evaluation, and/or treatment recommendation for the item described."
+
+::: {style="font-size: 0.3em"}
+Entman (1993)
+:::
+
+**Chan's restatement:** Frame is the result of an act of **selecting** certain aspects of a perceived reality by a communicator, whose **intention** is to promote a particular problem definition, causal interpretation, moral evalution, and/or treatment recommendation.
+
+## Generic frames
+
+"**transcend** thematic limitations and can be identified in relation to different topics, some even over time and in different cultural contexts" 
+
+::: {style="font-size: 0.3em"}
+de Vreese (2005)
+:::
+
+## Raison d'être: Factual data
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](valk.png)
+
+::: {style="font-size: 0.3em"}
+Semetko & Valkenburg (2000)
+:::
+
+:::
+
+::: {.column width="50%"}
+![](dag1.png)
+:::
+
+::::
+
+## Raison d'être: Counterfactual data
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](valk.png)
+
+::: {style="font-size: 0.3em"}
+Semetko & Valkenburg (2000)
+:::
+
+:::
+
+::: {.column width="50%"}
+![](dag2.png)
+:::
+
+::::
+
+## Generation of counterfactual data
+
+:::: {.columns}
+::: {.column width="50%"}
+
+![](counterfactual.png)
+
+:::
+
+::: {.column width="50%"}
+Topic and Communicative intention are independent and known
+
+:::
+
+::::
+
+## Distribution
+
+```{r}
+require(tidyverse)
+rio::import(here::here("data", "Frame Corpus.xlsx")) %>% tibble::as_tibble() -> frame_df
+frame_df$frame[frame_df$frame == "Economic Consequences"] <- "Conseq."
+frame_df$frame[frame_df$frame == "Human Interest"] <- "Hum. Int."
+frame_df$frame[frame_df$frame == "Responsibility"] <- "Resp."
+frame_df %>% group_by(topic, frame) %>% summarise(n = n()) %>% spread(frame, n) %>% ungroup %>% knitr::kable()
+```
+
+## Example: Evaluation I
+
+:::: {.columns}
+
+::: {.column width="50%"}
+![](generic.png)
+
+::: {style="font-size: 0.3em"}
+Semetko & Valkenburg (2000)
+:::
+
+:::
+
+::: {.column width="50%"}
+"Gold Standard"
+
+By two trained students; and two experts with PhD in communication
+:::
+
+::::
+
+## Multiverse analysis (Preregistered)
+
+```{r}
+ireadRDS <- function(fname) {
+    readRDS(here::here("intermediate", fname))
+}
+
+bind_rows(ireadRDS("expert_accuracy.RDS"), ireadRDS("human_accuracy.RDS")) %>% mutate(expert = c(rep(TRUE, 7), rep(FALSE, 5))) %>% mutate(se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se)) %>% arrange(maxp) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), col = expert, xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_manual(values = c("#000000", "#BBBBBB")) +  theme_minimal() + theme(legend.position = "none")
+```
+
+::: {style="font-size: 0.3em"}
+Pipal, Song, Boomgaarden (2022)
+:::
+
+## Example: Evaluation II
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Inductive methods**
+
+* K-means with TFIDF 
+* PCA with TF-IDF 
+* LDA 
+* STM 
+* ANTMN 
+
+::: {style="font-size: 0.3em"}
+(Burscher et al., 2016; Greussing & Boomgaarden, 2017; DiMaggio et al., 2013; Nicholls & Culpepper, 2021; Walter & Ophir, 2019)
+:::
+
+
+:::
+
+::: {.column width="50%"}
+**Semi-supervised methods**
+
+* Seeded-LDA
+* keyATM
+
+::: {style="font-size: 0.3em"}
+(Watanabe & Zhou, 2020; Eshima et al., 2020)
+:::
+
+Keywords from two journalism researchers
+
+k = 5
+:::
+
+::::
+
+## Multiverse analysis (an example)
+
+```{r}
+ireadRDS("ANTMN.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "ANTMN") -> antmnx
+
+antmnx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none", axis.text.y = element_text(size = 3))
+```
+
+## Method comparison
+
+```{r}
+require(brms)
+plot(conditional_effects(ireadRDS("brms_mod.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+```
+
+## Contributions
+
+* A counterfactual data for benchmarking frame detection methods
+* Methodological implications of the current benchmark: read our paper
