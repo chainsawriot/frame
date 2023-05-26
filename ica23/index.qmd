@@ -1,11 +1,11 @@
 ---
 title: "A counterfactual dataset"
-subtitle: "Frame Detection"
+subtitle: "For frame Detection"
 author: Chung-hong Chan
 institute: GESIS
 date: today
 date-format: "YYYY-MM-DD"
-footer: "@chainsawriot@emac.ch"
+footer: "chainsawriot.github.io/frameica23/"
 embed-resources: true
 format: fakegesis-revealjs
 ---
@@ -30,7 +30,11 @@ The authors would like to thank the Open Science Office, University of Mannheim 
 
 More infomation: [https://www.uni-mannheim.de/open-science/open-science-office/](https://www.uni-mannheim.de/open-science/open-science-office/)
 
-Also Valerie Hase (LMU Munich), and the following student helpers: Filippo Borsato, Hannah Erb, Hyosun Jang, Fatih Ozhasar, Zeynep Özgülec, and Jonathan Vincent.
+::: {style="font-size: 0.5em"}
+**Student helpers:** Filippo Borsato, Hannah Erb, Hyosun Jang, Fatih Ozhasar, Zeynep Özgülec, and Jonathan Vincent.
+:::
+
+Special thanks: Valerie Hase (LMU Munich)
 
 ::: {.notes}
 $$$
@@ -50,6 +54,10 @@ Carragee & Roefs (2004)
 Reese (2007)
 :::
 
+::: {.notes}
+I am about to give the obligatory nod
+:::
+
 ## What's a frame?
 
 **Entmanian Frame:** "Select some aspects of a perceived reality and make them more salient in a communicating text, in such a way as to promote a particular problem definition, causal interpretation, moral evaluation, and/or treatment recommendation for the item described."
@@ -62,7 +70,12 @@ Entman (1993)
 
 **Chan's restatement:** Frame is the result of an act of **selecting** certain aspects of a perceived reality by a communicator, whose **intention** is to promote a particular problem definition, causal interpretation, moral evalution, and/or treatment recommendation.
 
-## Generic frames
+
+::: {.notes}
+Entman's definition is a verb in active voice. It is about the authorial intention, much less about what you (or an algorithm) perceive.
+:::
+
+## Raison d'être: Generic frames
 
 "**transcend** thematic limitations and can be identified in relation to different topics, some even over time and in different cultural contexts" 
 
@@ -118,7 +131,7 @@ Semetko & Valkenburg (2000)
 :::
 
 ::: {.column width="50%"}
-Topic and Communicative intention are independent and known
+Topic and Communicative intention (frame) are independent and known
 
 :::
 
@@ -152,6 +165,11 @@ Semetko & Valkenburg (2000)
 "Gold Standard"
 
 By two trained students; and two experts with PhD in communication
+
+::: {style="font-size: 0.3em"}
+van Atteveldt, van der Velden M A C G, Boukes M. (2021)
+:::
+
 :::
 
 ::::
@@ -175,7 +193,7 @@ Pipal, Song, Boomgaarden (2022)
 :::: {.columns}
 
 ::: {.column width="50%"}
-**Inductive methods**
+**Inductive (automatic) methods**
 
 * K-means with TFIDF 
 * PCA with TF-IDF 
@@ -210,9 +228,9 @@ k = 5
 ## Multiverse analysis (an example)
 
 ```{r}
-ireadRDS("ANTMN.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "ANTMN") -> antmnx
+ireadRDS("STM.RDS") %>% mutate(maxp = map_dbl(res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha), se = sqrt((maxp * (1 - maxp)) / 100), upper = maxp + (1.59 * se), lower = maxp - (1.59 * se), method = "LDA") -> stmx
 
-antmnx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none", axis.text.y = element_text(size = 3))
+stmx %>% arrange(maxp) %>% ungroup %>% select(method, desc, maxp, lower, upper) %>% ggplot(aes(x = maxp, y = reorder(desc, maxp), xmin = lower, xmax = upper)) + geom_pointrange() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + theme(legend.position = "none")
 ```
 
 ## Method comparison
@@ -225,4 +243,39 @@ plot(conditional_effects(ireadRDS("brms_mod.RDS"), prob = 0.89), plot = FALSE)[[
 ## Contributions
 
 * A counterfactual data for benchmarking frame detection methods
-* Methodological implications of the current benchmark: read our paper
+* Limitations: "Counterfactual", small n, just one type of generic frame, not sustainable ($$$)
+* Preliminary methodological implications: read our paper
+
+::: {style="font-size: 0.7em"}
+(fin.)
+:::
+
+## Increasing N
+
+```{r}
+ns <- c(500, 1000, 2000)
+
+sreadRDS <- function(method, n) {
+    readRDS(here::here("intermediate/sim", paste0(method, "_sim", n, ".RDS")))
+}
+
+plotn <- function(method, n) {
+    sreadRDS(method, n) %>% mutate(maxp = map_dbl(res, max)) -> ldax
+    return(data.frame(x = seq(1, nrow(ldax)), method = method, n = n, maxp = sort(ldax$maxp)))
+}
+
+methods <- c("KM", "PCA", "LDA", "STM", "ANTMN", "SEEDED", "KEYATM")
+conditions <- expand.grid(ns, methods)
+
+purrr::map2_dfr(conditions$Var2, conditions$Var1, plotn) %>% mutate(n = factor(n, levels = ns)) %>% ggplot(aes(x = maxp, y = x, group = n, color = n)) + geom_line() + geom_vline(aes(xintercept = 0.2), alpha = 0.5, linetype = "dashed") + geom_vline(aes(xintercept = 0.3), alpha = 0.5, linetype = "dashed") + xlab(expression(CCR[max])) + xlim(0, 0.6) + ylab("Treatment") + facet_wrap(facets = vars(method), nrow = 3, scales = "free_y") + theme_minimal()
+```
+
+# Increasing N
+
+```{r}
+require(cowplot)
+p1 <- plot(conditional_effects(ireadRDS("sim/brms_mod_sim500.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+p2 <- plot(conditional_effects(ireadRDS("sim/brms_mod_sim1000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+p3 <- plot(conditional_effects(ireadRDS("sim/brms_mod_sim2000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
+plot_grid(p1, p2, p3, labels = c('500', '1000', '2000'), ncol = 1)
+```
