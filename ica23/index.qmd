@@ -243,7 +243,7 @@ plot(conditional_effects(ireadRDS("brms_mod.RDS"), prob = 0.89), plot = FALSE)[[
 ## Contributions
 
 * A counterfactual data for benchmarking frame detection methods
-* Limitations: "Counterfactual", small n, just one type of generic frame, not sustainable ($$$)
+* Limitations: "Counterfactual", small n, only one type of generic frame, not sustainable ($$$)
 * Preliminary methodological implications: read our paper
 
 ::: {style="font-size: 0.7em"}
