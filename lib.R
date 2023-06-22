@@ -39,36 +39,48 @@ spath <- function(fname) {
     return(x)
 }
 
-experiment_lda <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
-    x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
-    tmod_lda <- textmodel_lda(x, k = k, alpha = alpha)
-    topic_lda <- apply(tmod_lda$theta, 1, which.max)
-    .match_topics(topic_lda, frame_corpus)
+.get_hat_y <- function(p, p_is_hat_y) {
+    if (isFALSE(p_is_hat_y)) {
+        return(apply(p, 1, which.max))
+    }
+    p
 }
 
-experiment_stm <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
+.return_match <- function(match = TRUE, p, frame_corpus, p_is_hat_y = FALSE) {
+    if (isTRUE(match)) {
+        hat_y <- .get_hat_y(p = p, p_is_hat_y = p_is_hat_y)
+        return(.match_topics(hat_y, frame_corpus))
+    }
+    return(p)
+}
+
+experiment_lda <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus, k = 5, match = TRUE) {
+    x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
+    p <- textmodel_lda(x, k = k, alpha = alpha)$theta
+    .return_match(match, p, frame_corpus)
+}
+
+experiment_stm <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus, k = 5, match = TRUE) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
     x_stm <- convert(x, to = "stm")
-    model.stm <- suppressMessages(stm(x_stm$documents, x_stm$vocab, K = k, data = x_stm$meta, init.type = "Spectral", control = list(alpha = alpha)))
-    topic_stm <- apply(model.stm$theta, 1, which.max)
-    .match_topics(topic_stm, frame_corpus)    
+    p <- suppressMessages(stm(x_stm$documents, x_stm$vocab, K = k, data = x_stm$meta, init.type = "Spectral", control = list(alpha = alpha)))$theta
+    .return_match(match, p, frame_corpus)
 }
 
-experiment_km <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
+experiment_km <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus, k = 5, match = TRUE) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
     km_model <- kmeans(as.matrix(dfm_tfidf(x)), k)
-    topic_km <- km_model$cluster
-    .match_topics(topic_km, frame_corpus)
+    hat_y <- km_model$cluster
+    .return_match(match, hat_y, frame_corpus, p_is_hat_y = TRUE)
 }
 
-experiment_pca <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
+experiment_pca <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus, k = 5, match = TRUE) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
-    pr_x <- prcomp(as.matrix(dfm_tfidf(x)))
-    topic_pca <- apply(pr_x$x[,seq_len(5)], 1, which.max)
-    .match_topics(topic_pca, frame_corpus)
+    p <- prcomp(as.matrix(dfm_tfidf(x)))$x[,seq_len(k)]
+    .return_match(match, p, frame_corpus)
 }
 
-experiment_antmn <- function(words, stopwords, trim, alpha, k_factor, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
+experiment_antmn <- function(words, stopwords, trim, alpha, k_factor, normal_tokens, lemma_tokens, frame_corpus, k = 5, match = TRUE) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
     big_k <- k * k_factor
     tmod_lda <- textmodel_lda(x, k = big_k, alpha = alpha)
@@ -88,27 +100,44 @@ experiment_antmn <- function(words, stopwords, trim, alpha, k_factor, normal_tok
     for (j in seq_len(k)) {
         theta_sum[[j]] <- apply(theta[,which(reduced_trap == j), drop = FALSE], 1, sum)
     }
-    antmn_theta <- matrix(unlist(theta_sum), nrow = ndoc(frame_corpus), byrow = FALSE)
-    topic_antmn <- apply(antmn_theta, 1, which.max)
-    .match_topics(topic_antmn, frame_corpus)
+    p <- matrix(unlist(theta_sum), nrow = ndoc(frame_corpus), byrow = FALSE)
+    .return_match(match, p, frame_corpus)
 }
 
 ## k in these cases is controlled by the dictionary
 
-experiment_seeded <- function(words, stopwords, trim, alpha, expert, normal_tokens, lemma_tokens, frame_corpus, exp1, exp2, exp3) {
+experiment_seeded <- function(words, stopwords, trim, alpha, expert, normal_tokens, lemma_tokens, frame_corpus, exp1, exp2, exp3, match = TRUE) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
-    tmod_lda <- textmodel_seededlda(x, dictionary = list(exp1, exp2, exp3)[[expert]], alpha = alpha, valuetype = "glob")
-    topic_lda <- apply(tmod_lda$theta, 1, which.max)
-    .match_topics(topic_lda, frame_corpus)
+    p <- textmodel_seededlda(x, dictionary = list(exp1, exp2, exp3)[[expert]], alpha = alpha, valuetype = "glob")$theta
+    .return_match(match, p, frame_corpus)
 }
 
-experiment_keyatm <- function(words, stopwords, trim, alpha, expert, normal_tokens, lemma_tokens, frame_corpus, exp1, exp2, exp3) {
+experiment_keyatm <- function(words, stopwords, trim, alpha, expert, normal_tokens, lemma_tokens, frame_corpus, exp1, exp2, exp3, match = TRUE) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
     keyATMdoc <- keyATM_read(x)
     kw <- read_keywords(file = NULL, dictionary = list(exp1, exp2, exp3)[[expert]], keyATMdoc)
-    tmod_ka <- keyATM(keyATMdoc, model = "base", keywords = kw, no_keyword_topics = 0)
-    topic_ka <- apply(tmod_ka$theta, 1, which.max)
-    .match_topics(topic_ka, frame_corpus)
+    p <- keyATM(keyATMdoc, model = "base", keywords = kw, no_keyword_topics = 0)$theta
+    .return_match(match, p, frame_corpus)
+}
+
+generic_sim <- function(prefix, experiment_fun, conditions = NULL, .progress = TRUE, seed = 1212121, p_is_hat_y = FALSE) {
+    if (is.null(conditions)) {
+        conditions <- expand.grid(words = c("none", "stem", "lemma"), stopwords = c(TRUE, FALSE), trim = c(TRUE, FALSE))
+    }
+    frame_df <- rio::import(here::here("data", "Frame Corpus.xlsx")) %>% tibble::as_tibble()
+    frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars = data.frame(frame = frame_df$frame))
+    normal_tokens <- readRDS(ipath("normal_tokens.RDS"))
+    lemma_tokens <- readRDS(ipath("lemma_tokens.RDS"))
+    set.seed(seed)
+    p <- purrr::pmap(conditions, experiment_fun, .progress = TRUE, match = FALSE,
+                         normal_tokens = normal_tokens, lemma_tokens = lemma_tokens,
+                         frame_corpus = frame_corpus)
+    saveRDS(p, ipath(paste0(prefix, "_p.RDS")))
+    hat_y <- purrr::map(p, .get_hat_y, p_is_hat_y = p_is_hat_y)
+    res <- purrr::map(hat_y, .match_topics, frame_corpus = frame_corpus)
+    output <- conditions
+    output$res <- res
+    saveRDS(tibble::tibble(output), ipath(paste0(prefix, ".RDS")))
 }
 
 ns <- c(500, 1000, 2000)

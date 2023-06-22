@@ -32,20 +32,9 @@ frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars 
 
 conditions <- expand.grid(words = c("none", "stem", "lemma"), stopwords = c(TRUE, FALSE), trim = c(TRUE, FALSE), alpha = c(0.01, 0.05, 0.1, 0.2, 0.5, 1.0), expert = c(1, 2, 3))
 
-res <- list()
-for(i in seq_len(nrow(conditions))) {
-    print(i)
-    res[[i]] <- experiment_seeded(words = conditions$words[i],
-                                  stopwords = conditions$stopwords[i],
-                                  trim = conditions$trim[i],
-                                  alpha = conditions$alpha[i],
-                                  expert = conditions$expert[i],
-                                  normal_tokens = normal_tokens,
-                                  lemma_tokens = lemma_tokens,
-                                  frame_corpus = frame_corpus,
-                                  exp1 = exp1, exp2 = exp2, exp3 = exp3)
-}
+n_conditions <- nrow(conditions)
+conditions$exp1 <- rep(list(exp1), n_conditions)
+conditions$exp2 <- rep(list(exp2), n_conditions)
+conditions$exp3 <- rep(list(exp3), n_conditions)
 
-SEEDED <- conditions
-SEEDED$res <- res
-saveRDS(tibble::tibble(SEEDED), ipath("SEEDED.RDS"))
+generic_sim("SEEDED", experiment_seeded, conditions = conditions)
