@@ -39,38 +39,38 @@ spath <- function(fname) {
     return(x)
 }
 
-experiment_lda <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus) {
+experiment_lda <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
-    tmod_lda <- textmodel_lda(x, k = 5, alpha = alpha)
+    tmod_lda <- textmodel_lda(x, k = k, alpha = alpha)
     topic_lda <- apply(tmod_lda$theta, 1, which.max)
     .match_topics(topic_lda, frame_corpus)
 }
 
-experiment_stm <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus) {
+experiment_stm <- function(words, stopwords, trim, alpha, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
     x_stm <- convert(x, to = "stm")
-    model.stm <- suppressMessages(stm(x_stm$documents, x_stm$vocab, K = 5, data = x_stm$meta, init.type = "Spectral", control = list(alpha = alpha)))
+    model.stm <- suppressMessages(stm(x_stm$documents, x_stm$vocab, K = k, data = x_stm$meta, init.type = "Spectral", control = list(alpha = alpha)))
     topic_stm <- apply(model.stm$theta, 1, which.max)
     .match_topics(topic_stm, frame_corpus)    
 }
 
-experiment_km <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus) {
+experiment_km <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
-    km_model <- kmeans(as.matrix(dfm_tfidf(x)), 5)
+    km_model <- kmeans(as.matrix(dfm_tfidf(x)), k)
     topic_km <- km_model$cluster
     .match_topics(topic_km, frame_corpus)
 }
 
-experiment_pca <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus) {
+experiment_pca <- function(words, stopwords, trim, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
     pr_x <- prcomp(as.matrix(dfm_tfidf(x)))
-    topic_pca <- apply(pr_x$x[,1:5], 1, which.max)
+    topic_pca <- apply(pr_x$x[,seq_len(5)], 1, which.max)
     .match_topics(topic_pca, frame_corpus)
 }
 
-experiment_antmn <- function(words, stopwords, trim, alpha, k_factor, normal_tokens, lemma_tokens, frame_corpus) {
+experiment_antmn <- function(words, stopwords, trim, alpha, k_factor, normal_tokens, lemma_tokens, frame_corpus, k = 5) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
-    big_k <- 5 * k_factor
+    big_k <- k * k_factor
     tmod_lda <- textmodel_lda(x, k = big_k, alpha = alpha)
     theta <- tmod_lda$theta
     colnames(theta) <- seq_len(ncol(theta))
@@ -81,17 +81,19 @@ experiment_antmn <- function(words, stopwords, trim, alpha, k_factor, normal_tok
                                  weighted=TRUE, diag = FALSE, add.colnames="label")
     newg <- topmodnet
     mywalktrap <- cluster_walktrap(newg)
-    reduced_trap <- cut_at(mywalktrap, 5)
+    reduced_trap <- cut_at(mywalktrap, k)
     ## topic_lda <- apply(theta, 1, which.max)
     ## topic_antmn <- reduced_trap[topic_lda]
     theta_sum <- list()
-    for (j in 1:5) {
+    for (j in seq_len(k)) {
         theta_sum[[j]] <- apply(theta[,which(reduced_trap == j), drop = FALSE], 1, sum)
     }
-    antmn_theta <- matrix(c(theta_sum[[1]], theta_sum[[2]], theta_sum[[3]], theta_sum[[4]], theta_sum[[5]]), nrow = ndoc(frame_corpus), byrow = FALSE)
+    antmn_theta <- matrix(unlist(theta_sum), nrow = ndoc(frame_corpus), byrow = FALSE)
     topic_antmn <- apply(antmn_theta, 1, which.max)
     .match_topics(topic_antmn, frame_corpus)
 }
+
+## k in these cases is controlled by the dictionary
 
 experiment_seeded <- function(words, stopwords, trim, alpha, expert, normal_tokens, lemma_tokens, frame_corpus, exp1, exp2, exp3) {
     x <- .gen_dfm(words, stopwords, trim, normal_tokens, lemma_tokens)
