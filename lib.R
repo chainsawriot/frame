@@ -14,12 +14,12 @@ spath <- function(fname) {
     here::here("intermediate/sim", fname)
 }
 
-.match_topics <- function(topics, frame_corpus) {
+.match_topics <- function(hat_y, frame_corpus) {
     possible_frames <- unique(docvars(frame_corpus)$frame)
     perm15 <- permn(seq_len(length(possible_frames)))
-    return(purrr::map_dbl(seq_len(length(perm15)),
-                          ~ sum(diag(table(docvars(frame_corpus)$frame,
-                                           possible_frames[match(topics, perm15[[.]])]))) / ndoc(frame_corpus)))
+    return(
+        purrr::map_dbl(perm15, ~ sum(diag(table(docvars(frame_corpus)$frame,
+                                                possible_frames[match(hat_y, .)]))) / ndoc(frame_corpus)))
 }
 
 .gen_dfm <- function(words, stopwords, trim, normal_tokens, lemma_tokens) {
@@ -39,7 +39,7 @@ spath <- function(fname) {
     return(x)
 }
 
-.get_hat_y <- function(p, p_is_hat_y) {
+.get_hat_y <- function(p, p_is_hat_y = FALSE) {
     if (isFALSE(p_is_hat_y)) {
         return(apply(p, 1, which.max))
     }
@@ -138,6 +138,29 @@ generic_sim <- function(prefix, experiment_fun, conditions = NULL, .progress = T
     output <- conditions
     output$res <- res
     saveRDS(tibble::tibble(output), ipath(paste0(prefix, ".RDS")))
+}
+
+.cal_ccr <- function(perm, hat_y, frame_corpus) {
+    gt <- docvars(frame_corpus)$frame
+    possible_frames <- unique(docvars(frame_corpus)$frame)
+    hat_topic <- possible_frames[match(hat_y, perm)]
+    correct_cases <- sum(gt == hat_topic)
+    return(correct_cases / length(gt))
+}
+
+.cal_ccr_no_moral <- function(perm, hat_y, frame_corpus) {
+    gt <- docvars(frame_corpus)$frame
+    is_moral <- gt == "Morality"
+    possible_frames <- unique(docvars(frame_corpus)$frame)
+    hat_topic <- possible_frames[match(hat_y, perm)]
+    correct_cases <- sum(gt[!is_moral] == hat_topic[!is_moral])
+    return(correct_cases / length(gt[!is_moral]))
+}
+
+.match_topics_no_moral <- function(hat_y, frame_corpus) {
+    possible_frames <- unique(docvars(frame_corpus)$frame)
+    perm15 <- permn(seq_len(length(possible_frames)))
+    return(purrr::map_dbl(perm15, .cal_ccr_no_moral, hat_y = hat_y, frame_corpus = frame_corpus))
 }
 
 ns <- c(500, 1000, 2000)
