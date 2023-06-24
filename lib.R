@@ -163,4 +163,8 @@ generic_sim <- function(prefix, experiment_fun, conditions = NULL, .progress = T
     return(purrr::map_dbl(perm15, .cal_ccr_no_moral, hat_y = hat_y, frame_corpus = frame_corpus))
 }
 
+ireadRDS <- function(fname) {
+    readRDS(here::here("intermediate", fname))
+}
+
 ns <- c(500, 1000, 2000)

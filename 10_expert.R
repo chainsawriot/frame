@@ -61,8 +61,8 @@ b_varm <- apply(varm$scores, 1, which.max)
 
 twoexperts_varimax <- max(.match_topics(b_varm, frame_corpus))
 
-expert1_excl <- max(.match_topics(expert1$F1, frame_corpus))
-expert2_excl <- max(.match_topics(expert2$F1, frame_corpus))
+expert1_excl <- max(.match_topics(expert1$F1+1, frame_corpus))
+expert2_excl <- max(.match_topics(expert2$F1+1, frame_corpus))
 
 tibble(desc = c("1 expert, avg", "1 expert, avg, binary", "1 expert, varimax", "Expert A, Exclusionary", "Expert B, Exclusionary",  "2 experts, avg", "2 experts, varimax"), maxp = c(oneexpert, oneexpertb, oneexpert_varimax, expert1_excl, expert2_excl, twoexperts, twoexperts_varimax)) -> expert_accuracy
 
