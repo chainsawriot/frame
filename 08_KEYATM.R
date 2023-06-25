@@ -23,29 +23,30 @@ exp2 <- dictionary(list(resp = resp2, human = human2, conflict = conflict2, mora
 
 exp3 <- dictionary(list(resp = union(resp, resp2), human = union(human, human2), conflict = union(conflict, conflict2), moral = union(moral, moral2), econ = union(econ, econ2)))
 
-normal_tokens <- readRDS(ipath("normal_tokens.RDS"))
-
-lemma_tokens <- readRDS(ipath("lemma_tokens.RDS"))
-frame_df <- readRDS(ipath("frame_df.RDS"))
-
-frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars = data.frame(frame = frame_df$frame))
-
 conditions <- expand.grid(words = c("none", "stem", "lemma"), stopwords = c(TRUE, FALSE), trim = c(TRUE, FALSE), alpha = c(0.01, 0.05, 0.1, 0.2, 0.5, 1.0), expert = c(1, 2, 3))
 
-res <- list()
-for(i in seq_len(nrow(conditions))) {
-    print(i)
-    res[[i]] <- experiment_keyatm(words = conditions$words[i],
-                                  stopwords = conditions$stopwords[i],
-                                  trim = conditions$trim[i],
-                                  alpha = conditions$alpha[i],
-                                  expert = conditions$expert[i],
-                                  normal_tokens = normal_tokens,
-                                  lemma_tokens = lemma_tokens,
-                                  frame_corpus = frame_corpus,
-                                  exp1 = exp1, exp2 = exp2, exp3 = exp3)
-}
+n_conditions <- nrow(conditions)
+conditions$exp1 <- rep(list(exp1), n_conditions)
+conditions$exp2 <- rep(list(exp2), n_conditions)
+conditions$exp3 <- rep(list(exp3), n_conditions)
 
-KEYATM <- conditions
-KEYATM$res <- res
-saveRDS(tibble::tibble(KEYATM), ipath("KEYATM.RDS"))
+generic_sim("KEYATM", experiment_keyatm, conditions = conditions)
+
+
+## res <- list()
+## for(i in seq_len(nrow(conditions))) {
+##     print(i)
+##     res[[i]] <- experiment_keyatm(words = conditions$words[i],
+##                                   stopwords = conditions$stopwords[i],
+##                                   trim = conditions$trim[i],
+##                                   alpha = conditions$alpha[i],
+##                                   expert = conditions$expert[i],
+##                                   normal_tokens = normal_tokens,
+##                                   lemma_tokens = lemma_tokens,
+##                                   frame_corpus = frame_corpus,
+##                                   exp1 = exp1, exp2 = exp2, exp3 = exp3)
+## }
+
+## KEYATM <- conditions
+## KEYATM$res <- res
+## saveRDS(tibble::tibble(KEYATM), ipath("KEYATM.RDS"))
