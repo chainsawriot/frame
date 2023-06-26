@@ -27,6 +27,10 @@ all_uni[all_uni$method == "antmn" & all_uni$words == "none" & all_uni$trim & all
 
 all_uni %>% mutate(method = fct_relevel(method, "gold", "seededlda", "keyATM")) %>% ggplot(aes(x = maxp, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank") + geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + xlim(c(0, 0.7)) + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none") 
 
+all_uni %>% filter(method == "antmn") %>% ggplot(aes(x = maxp, y = method, fill = recommend)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank") + geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + xlim(c(0, 0.7)) + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none") + scale_fill_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+
+
+
 ## geom_density_ridges(stat = "binline", jittered_points = TRUE,position = position_points_jitter(width = 0.05, height = 0), point_shape = 'X', point_size = 3, point_alpha = 1, alpha = 0.7)
 
 set.seed(12121)

@@ -87,47 +87,85 @@ frame_corpus <- corpus(x = frame_df$Content, docnames = frame_df$docid, docvars 
 }
 
 prefix <- "KM"
-mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = TRUE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = TRUE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
 ### Principal Component Analysis + TF-IDF
 
 ```{r pca, fig.cap = "Multiverse analysis of PCA"}
 prefix <- "PCA"
-mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
 ### LDA
 
 ```{r lda, fig.cap = "Multiverse analysis of LDA", fig.height = 8}
 prefix <- "LDA"
-mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix))  %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix))  %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
 ### STM
 
 ```{r stm, fig.cap = "Multiverse analysis of STM", fig.height = 8}
 prefix <- "STM"
-mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix))  %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix))  %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
 ### ANTMN
 
 ```{r antmn, fig.cap = "Multiverse analysis of ANTMN", fig.height = 8}
 prefix <- "ANTMN"
-mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
 ### Seeded-LDA
 
 ```{r seeded, fig.cap = "Multiverse analysis of seeded-LDA", fig.height = 8}
 prefix <- "KEYATM"
-mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
 ```{r keyatm, fig.cap = "Multiverse analysis of keyATM", fig.height = 8}
 prefix <- "SEEDED"
-mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
+```
+
+## Visualization of tau (TODO)
+
+```{r tau_pca}
+prefix <- "PCA"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, tau, tau_gt) %>% ungroup() %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none") 
+```
+
+```{r tau_stm}
+prefix <- "STM"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none")
+```
+
+```{r tau_lda}
+prefix <- "LDA"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none") 
+```
+
+```{r tau_antmn}
+prefix <- "ANTMN"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
+```
+
+```{r tau_seeded}
+prefix <- "SEEDED"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
+```
+
+```{r tau_keyatm}
+prefix <- "KEYATM"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
 ```
 
 ## Visualization of the variance
@@ -200,17 +238,17 @@ The above figure shows the sorted $CCR_{max}$ like the visualization of multiver
 
 From this simulation, it is extremely unlikely that increasing the sample size would increase the $CCR_{max}$ for all unsupervised methods. Instead, all methods, except KM and STM, perform more like the de-facto null (0.3) with the increasing sample size. Therefore, these methods appear to be more keen to pick up **topics**, rather than frames, when sample size increases: the sorted performance curve rescinding towards the null value with the highest sample size. For the two semi-supervised methods, increasing the sample size appears to provide better resistance against the rescinding.
 
-We also performed the same Bayesian analysis using the simulated data. By increasing the sample size, it appears that both H1 and H2 would become more significant, instead of the other way around.
+<!-- We also performed the same Bayesian analysis using the simulated data. By increasing the sample size, it appears that both H1 and H2 would become more significant, instead of the other way around. -->
 
-```{r simbrms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semi-supervised and automatic methods at 89% credibility with different simulated sample sizes"}
-p1 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim500.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
-p2 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim1000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
-p3 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim2000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none")
-plot_grid(p1, p2, p3, labels = c('500', '1000', '2000'), ncol = 1)
-```
+<!-- ```{r simbrms, fig.cap = "Robust conditional effects from the Bayesian model of the \"gold standard\", semi-supervised and automatic methods at 89% credibility with different simulated sample sizes"} -->
+<!-- p1 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim500.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none") -->
+<!-- p2 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim1000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none") -->
+<!-- p3 <- plot(conditional_effects(readRDS("intermediate/sim/brms_mod_sim2000.RDS"), prob = 0.89), plot = FALSE)[[1]] + coord_flip() + geom_hline(aes(yintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_hline(aes(yintercept = 0.3, alpha = 0.5), linetype = "dashed") +  ylab(expression(CCR[max])) + xlab("Method type") + theme_minimal() + theme(legend.position = "none") -->
+<!-- plot_grid(p1, p2, p3, labels = c('500', '1000', '2000'), ncol = 1) -->
+<!-- ``` -->
 
-## Regression coefficients of the Bayesian model
+<!-- ## Regression coefficients of the Bayesian model -->
 
-```{r, results = "asis", echo = FALSE}
-print2("", readRDS(here::here("intermediate", "brms_mod.RDS")))
-```
+<!-- ```{r, results = "asis", echo = FALSE} -->
+<!-- print2("", readRDS(here::here("intermediate", "brms_mod.RDS"))) -->
+<!-- ``` -->
