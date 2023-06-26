@@ -167,4 +167,16 @@ ireadRDS <- function(fname) {
     readRDS(here::here("intermediate", fname))
 }
 
+.match_topics_tau <- function(hat_yp, reference_y) {
+    possible_frames <- unique(docvars(frame_corpus)$frame)
+    perm15 <- permn(seq_len(length(possible_frames)))
+    purrr::map_dbl(perm15, ~cor(reference_y, c(hat_yp[,.])))
+}
+
+.gen_tau <- function(prefix, reference_y, ending = "_tau.RDS") {
+    p <- readRDS(ipath(paste0(prefix, "_p.RDS")))
+    res <- purrr::map(p, .match_topics_tau, reference_y = reference_y)
+    saveRDS(res, ipath(paste0(prefix, ending)))
+}
+
 ns <- c(500, 1000, 2000)
