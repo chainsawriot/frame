@@ -42,11 +42,15 @@ colnames(zohuman) <- str_extract(colnames(zohuman), "^[A-Z][0-9]")
 
 hjhuman %>% mutate(avga = (A1+A2+A3+A4+A5)/5, avgb = (B1+B2+B3+B4)/4, avgc = (C1+ C2+ C3+C4)/4, avgd = (D1+ D2+ D3)/3, avge = (E1+ E2+ E3) / 3) %>% select(starts_with("avg")) %>% rowwise() %>% mutate(maxx = which.max(c(avga, avgb, avgc, avgd, avge))) %>% pull(maxx) -> hj
 
+hjhuman %>% mutate(avga = (A1+A2+A3+A4+A5)/5, avgb = (B1+B2+B3+B4)/4, avgc = (C1+ C2+ C3+C4)/4, avgd = (D1+ D2+ D3)/3, avge = (E1+ E2+ E3) / 3) %>% select(starts_with("avg")) %>% saveRDS(ipath("onecoder_scores.RDS"))
+
 onecoder <- max(.match_topics(hj, frame_corpus))
 
 hjhuman %>% mutate_all(~ . != 0) %>% mutate(avga = (A1+A2+A3+A4+A5)/5, avgb = (B1+B2+B3+B4)/4, avgc = (C1+ C2+ C3+C4)/4, avgd = (D1+ D2+ D3)/3, avge = (E1+ E2+ E3) / 3) %>% select(starts_with("avg")) %>% rowwise() %>% mutate(maxx = which.max(c(avga, avgb, avgc, avgd, avge))) %>% pull(maxx) -> hjb
 
 onecoderb <- max(.match_topics(hjb, frame_corpus))
+
+hjhuman %>% mutate_all(~ . != 0) %>% mutate(avga = (A1+A2+A3+A4+A5)/5, avgb = (B1+B2+B3+B4)/4, avgc = (C1+ C2+ C3+C4)/4, avgd = (D1+ D2+ D3)/3, avge = (E1+ E2+ E3) / 3) %>% select(starts_with("avg")) %>% saveRDS(ipath("onecoderb_scores.RDS"))
 
 ## possible_frames
 
@@ -59,6 +63,8 @@ varm <- psych::principal(hjhuman, nfactors = 5, scores = TRUE)
 
 hj_varm <- apply(varm$scores, 1, which.max)
 
+varm$scores %>% saveRDS(ipath("onecoder_varimax_scores.RDS"))
+
 onecoder_varimax <- max(.match_topics(hj_varm, frame_corpus))
 
 hjhuman %>% mutate(avga = (A1+A2+A3+A4+A5), avgb = (B1+B2+B3+B4), avgc = (C1+ C2+ C3+C4), avgd = (D1+ D2+ D3), avge = (E1+ E2+ E3)) %>% select(starts_with("avg")) -> thj
@@ -67,12 +73,16 @@ zohuman %>% mutate(avga = (A1+A2+A3+A4+A5), avgb = (B1+B2+B3+B4), avgc = (C1+ C2
 
 bind_cols(thj, zoj) %>% mutate(scorea = (avga + zavga) / 10, scoreb = (avgb + zavgb) / 8, scorec = (avgc + zavgc) / 8, scored = (avgd + zavgd) / 6, scoree = (avge + zavge) / 6) %>% select(starts_with("score")) %>% rowwise() %>% mutate(maxx = which.max(c(scorea, scoreb, scorec, scored, scoree))) %>% pull(maxx) -> bothhuman
 
+bind_cols(thj, zoj) %>% mutate(scorea = (avga + zavga) / 10, scoreb = (avgb + zavgb) / 8, scorec = (avgc + zavgc) / 8, scored = (avgd + zavgd) / 6, scoree = (avge + zavge) / 6) %>% select(starts_with("score")) %>% saveRDS(ipath("twocoders_scores.RDS"))
+
 twocoders <- max(.match_topics(bothhuman, frame_corpus))
 
 ## bind_cols(thj, zoj) %>% mutate(scorea = (avga + zavga) / 10, scoreb = (avgb + zavgb) / 8, scorec = (avgc + zavgc) / 8, scored = (avgd + zavgd) / 6, scoree = (avge + zavge) / 6) %>% select(starts_with("score"))
 
 varm <- psych::principal(bind_cols(hjhuman, zohuman), nfactors = 5, scores = TRUE)
 b_varm <- apply(varm$scores, 1, which.max)
+
+varm$scores %>% saveRDS(ipath("twocoders_varimax_scores.RDS"))
 
 twocoder_varimax <- max(.match_topics(b_varm, frame_corpus))
 
