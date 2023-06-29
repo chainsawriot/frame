@@ -14,6 +14,10 @@ format: fakegesis-revealjs
 
 ~~Frame? Kein Thema! Die Validität der induktiven Frame-Erkennung in Texten mit mehreren Themen~~
 
+::: {style="font-size: 0.5em"}
+[Older slides](https://chainsawriot.github.io/frame/)
+:::
+
 A counterfactual dataset for evaluating frame detection methods in multi-topical news content
 
 * Chung-hong Chan
@@ -104,38 +108,11 @@ Semetko & Valkenburg (2000)
 
 ## Raison d'être: Counterfactual data
 
-:::: {.columns}
-
-::: {.column width="50%"}
-![](valk.png)
-
-::: {style="font-size: 0.3em"}
-Semetko & Valkenburg (2000)
-:::
-
-:::
-
-::: {.column width="50%"}
 ![](dag2.png)
-:::
-
-::::
 
 ## Generation of counterfactual data
 
-:::: {.columns}
-::: {.column width="50%"}
-
 ![](counterfactual.png)
-
-:::
-
-::: {.column width="50%"}
-Topic and Communicative intention (frame) are independent and known
-
-:::
-
-::::
 
 ## Distribution
 
@@ -164,7 +141,9 @@ Semetko & Valkenburg (2000)
 ::: {.column width="50%"}
 "Gold Standard"
 
-By two trained students; and two experts with PhD in communication
+2 x trained students
+
+2 x experts with PhD in communication
 
 ::: {style="font-size: 0.3em"}
 van Atteveldt, van der Velden M A C G, Boukes M. (2021)
@@ -243,10 +222,12 @@ plot(conditional_effects(ireadRDS("brms_mod.RDS"), prob = 0.89), plot = FALSE)[[
 ## Contributions
 
 * A counterfactual data for benchmarking frame detection methods
-* Limitations: "Counterfactual", small n, only one type of generic frame, not sustainable ($$$)
+* Limitations: "Counterfactual", small n (not sustainable $$$), only one type of generic frame, Turtles all the way down
 * Preliminary methodological implications: read our paper
 
-::: {style="font-size: 0.7em"}
+::: {style="font-size: 0.5em"}
+[OSF Link](https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a)
+
 (fin.)
 :::
 
