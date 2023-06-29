@@ -32,3 +32,30 @@ gt_vector <- c(gt_matrix)
 purrr::walk(c("PCA", "LDA", "STM", "ANTMN", "SEEDED", "KEYATM"), .gen_tau, reference_y = expert_vector, .progress = TRUE) 
 
 purrr::walk(c("PCA", "LDA", "STM", "ANTMN", "SEEDED", "KEYATM"), .gen_tau, reference_y = gt_vector, ending = "_tau_gt.RDS", .progress = TRUE) 
+
+## human
+
+.match_topics_tau(as.matrix(ireadRDS("onecoder_scores.RDS")), expert_vector) %>% max -> onecoder_tau
+
+.match_topics_tau(as.matrix(ireadRDS("onecoderb_scores.RDS")), expert_vector) %>% max -> onecoderb_tau
+
+.match_topics_tau(as.matrix(ireadRDS("onecoder_varimax_scores.RDS")), expert_vector) %>% max -> onecoder_varimax_tau
+
+.match_topics_tau(as.matrix(ireadRDS("twocoders_scores.RDS")), expert_vector) %>% max -> twocoders_tau
+
+.match_topics_tau(as.matrix(ireadRDS("twocoders_varimax_scores.RDS")), expert_vector) %>% max -> twocoders_varimax_tau
+
+tibble(desc = c("1 coder, avg", "1 coder, avg, binary", "1 coder, varimax", "two coders, avg", "two coders, varimax"), tau = c(onecoder_tau, onecoderb_tau, onecoder_varimax_tau, twocoders_tau, twocoders_varimax_tau))  %>% saveRDS(ipath("human_tau.RDS"))
+
+
+.match_topics_tau(as.matrix(ireadRDS("onecoder_scores.RDS")), gt_vector) %>% max -> onecoder_tau
+
+.match_topics_tau(as.matrix(ireadRDS("onecoderb_scores.RDS")), gt_vector) %>% max -> onecoderb_tau
+
+.match_topics_tau(as.matrix(ireadRDS("onecoder_varimax_scores.RDS")), gt_vector) %>% max -> onecoder_varimax_tau
+
+.match_topics_tau(as.matrix(ireadRDS("twocoders_scores.RDS")), gt_vector) %>% max -> twocoders_tau
+
+.match_topics_tau(as.matrix(ireadRDS("twocoders_varimax_scores.RDS")), gt_vector) %>% max -> twocoders_varimax_tau
+
+tibble(desc = c("1 coder, avg", "1 coder, avg, binary", "1 coder, varimax", "two coders, avg", "two coders, varimax"), tau = c(onecoder_tau, onecoderb_tau, onecoder_varimax_tau, twocoders_tau, twocoders_varimax_tau))  %>% saveRDS(ipath("human_tau_gt.RDS"))

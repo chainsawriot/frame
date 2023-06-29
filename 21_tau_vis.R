@@ -23,3 +23,8 @@ mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(pr
 prefix <- "KEYATM"
 
 mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
+
+prefix <- "human"
+ireadRDS(paste0(prefix, "_tau.RDS")) %>% mutate(tau_gt = ireadRDS(paste0(prefix, "_tau_gt.RDS"))$tau) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 1) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
+
+

@@ -167,9 +167,9 @@ ireadRDS <- function(fname) {
     readRDS(here::here("intermediate", fname))
 }
 
-.match_topics_tau <- function(hat_yp, reference_y) {
-    possible_frames <- unique(docvars(frame_corpus)$frame)
-    perm15 <- permn(seq_len(length(possible_frames)))
+.match_topics_tau <- function(hat_yp, reference_y, n_possible_frames = 5) {
+    ## possible_frames <- unique(docvars(frame_corpus)$frame)
+    perm15 <- permn(seq_len(n_possible_frames))
     purrr::map_dbl(perm15, ~cor(reference_y, c(hat_yp[,.])))
 }
 

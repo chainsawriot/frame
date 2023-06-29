@@ -1,6 +1,8 @@
 ---
-title             : "A benchmark dataset for detecting frames in multi-topical news content: Online Appendix"
+title             : "Synthesizing an experimental dataset for the evaluation of generic frame detection as a task of detecting communicative intention: Online Appendix"
+shorttitle            : "FRAME DETECTION"
 floatsintext      : yes
+bibliography          : "frame.bib"
 output:
  papaja::apa6_pdf:
    latex_engine: xelatex
@@ -65,15 +67,45 @@ Morality frame
 * Is there a mention of the costs/degree of expense involved?
 * Is there a reference to economic consequences of pursuing or not pursuing a course of action?
 
+## Overview of all automatic and supervised methods employed
+
+### k-Means
+
+Each document is assigned a vector containing the frequency of each word that occurs in the document (term frequency - TF), weighed against how many documents that word appears in (inverse document frequency - IDF). That way, the term vector is a representation of how documents differ from each other based on how different the words that are used within are. Weighing against inverse document frequency ensures that rare words (which contain more information, e.g. “nuclear”) have more weight than common, generic words (e.g. “man”). Cluster analysis is used to group together documents based on how similar their word vectors are - with k-means clustering, the number of clusters is decided beforehand. Clusters are found by searching for the cluster distribution with the lowest within-cluster sum of squares [@burscher:2014:TCC].
+
+### Principal Component Analysis (PCA)
+
+As above, each document is assigned a vector containing the frequency of each word that occurs in the document (term frequency - TF), weighed against how many documents that word appears in (inverse document frequency - IDF). A TF-IDF can be interpreted as a long list of dimensions in an n-dimensional space. Principal Component Analysis is used to reduce those dimensions by projecting the n-dimensional data onto a space with fewer dimensions (in our case: 5) while maintaining as much variance (and hence: information) as possible. That way, individual word vectors that often occur together will inform the same components in the resulting model. The components can then be interpreted as correlating with Frames [@greussing:2017:S].
+
+### Latent Dirichlet Allocation (LDA)
+
+Topic Modelling assumes that there is a number of topics distributed over the documents you analyze. Topics are expressed through co-occurrence of common vocabulary (e.g.: an “economy” topic would be expressed through words like “costs”, “inflation” etc.). Latent Dirichlet Allocation follows this intuition and tries to allocate words into topics such that both for each document, the words are allocated to as few topics as possible and that for few and rare words, higher topic probabilities are assigned than to common terms. From a Bayesian perspective, each document is assigned topic probabilities for a pre-set number of topics using a hierarchical probabilistic model. The resulting probabilities represent commonly co-occuring terms, which are interpreted as representing common topics of documents [@dimaggio:2013:E].
+
+### Structural Topic Model (STM)
+
+Uses a similar approach to LDA, described above, but allows for using metadata that covaries with topics and allows for topics that correlate with each other [@nicholls:2020:CIM].
+
+### Analysis of Topic Model Networks (ANTMN) 
+
+LDA topic modelling is applied (see above). The number of topics is optimized based on commonly used indicators to assess topic quality. Then, co-occurence of topics is used to generate a topic model network: topics are treated as nodes, their theta-cosine similarity is treated as edges between nodes. Network community detection algorithms are used to combine topics into larger topic communities based on this similarity-network, which are interpreted as representing frames [@walter:2019:NFA].
+
+### Seeded-LDA 
+
+Employs LDA topic modelling (see above), but the researcher applies seed terms derived from theory to guide the topic modelling process: Each seed provided by the researcher is given a prior weight towards topics. The LDA model then assigns topics to documents taking these prior weights into account [@watanabe:2020:TDA].
+
+### Keyword Assisted Topic Model (keyATM) 
+
+Similar to seeded-LDA [@eshima2020keyatm].
+
 ## Multiverse analysis of all methods (based on the ground truth)
+
+These figures display the multiverse analyses of human coding (Figure \@ref(fig:human)), K-Means + TF-IDF (Figure \@ref(fig:km)), PCA + TF-IDF (Figure \@ref(fig:pca)), LDA (Figure \@ref(fig:lda)), STM (Figure \@ref(fig:stm)), ANTMN (Figure \@ref(fig:antmn)), seeded LDA (Figure \@ref(fig:seeded)), and KeyATM (Figure \@ref(fig:keyatm)). These figures display the analyses using the original 100-article corpus (green dots) and the corpus without the Morality articles (orange dots).
 
 ```{r human, fig.cap = "Multiverse analysis of human coding"}
 bind_rows(ireadRDS("expert_accuracy_k4.RDS"), ireadRDS("human_accuracy_k4.RDS")) %>% mutate(expert = c(rep(TRUE, 7), rep(FALSE, 5))) %>% pull(maxp) -> k4_p
 
 bind_rows(ireadRDS("expert_accuracy.RDS"), ireadRDS("human_accuracy.RDS")) %>% mutate(expert = c(rep(TRUE, 7), rep(FALSE, 5))) %>% mutate(maxp2 = k4_p) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% mutate(desc = reorder(desc, ccr)) %>% ggplot(aes(y = reorder(desc, ccr), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
-
-### K-Means + TF-IDF
 
 ```{r km, fig.cap = "Multiverse analysis of K-Means"}
 set.seed(1212121)
@@ -90,35 +122,25 @@ prefix <- "KM"
 mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = TRUE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
-### Principal Component Analysis + TF-IDF
-
 ```{r pca, fig.cap = "Multiverse analysis of PCA"}
 prefix <- "PCA"
 mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
-
-### LDA
 
 ```{r lda, fig.cap = "Multiverse analysis of LDA", fig.height = 8}
 prefix <- "LDA"
 mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix))  %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1)  + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
-### STM
-
 ```{r stm, fig.cap = "Multiverse analysis of STM", fig.height = 8}
 prefix <- "STM"
 mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix))  %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
-### ANTMN
-
 ```{r antmn, fig.cap = "Multiverse analysis of ANTMN", fig.height = 8}
 prefix <- "ANTMN"
 mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
-
-### Seeded-LDA
 
 ```{r seeded, fig.cap = "Multiverse analysis of seeded-LDA", fig.height = 8}
 prefix <- "KEYATM"
@@ -130,69 +152,211 @@ prefix <- "SEEDED"
 mutate(readRDS(ipath(paste0(prefix, ".RDS"))), no_m_res = .gen_no_m_res(prefix, p_is_hat_y = FALSE)) %>% mutate(maxp = purrr::map_dbl(res, max), maxp2 = purrr::map_dbl(no_m_res, max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, maxp, maxp2) %>% pivot_longer(!desc, names_to = "x", values_to = "ccr") %>% ggplot(aes(y = fct_reorder2(desc, x, ccr, .desc = FALSE), x = ccr, color = x)) + geom_point() + xlim(0, 1) + geom_vline(aes(xintercept = 0.2, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.3, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed", col = "red") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed", col = "red") + xlab(expression(CCR[max])) + ylab("Treatment") + scale_color_brewer(palette="Dark2") +  theme_minimal() + theme(legend.position = "none")
 ```
 
-## Visualization of tau (TODO)
+### Visualization of the variance
 
-```{r tau_pca}
-prefix <- "PCA"
+The variance of $CCR_{max}$ is displayed in Figure \@ref(fig:variance).
 
-mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, tau, tau_gt) %>% ungroup() %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none") 
-```
-
-```{r tau_stm}
-prefix <- "STM"
-
-mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none")
-```
-
-```{r tau_lda}
-prefix <- "LDA"
-
-mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none") 
-```
-
-```{r tau_antmn}
-prefix <- "ANTMN"
-
-mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
-```
-
-```{r tau_seeded}
-prefix <- "SEEDED"
-
-mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
-```
-
-```{r tau_keyatm}
-prefix <- "KEYATM"
-
-mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") 
-```
-
-## Visualization of the variance
-
-```{r, message = FALSE, echo = FALSE}
+```{r variance, message = FALSE, echo = FALSE, fig.cap = "Variance of the best case correct classification rates"}
 ireadRDS <- function(fname) {
     readRDS(here::here("intermediate", fname))
 }
 
-bind_rows(mutate(ireadRDS("KM.RDS"), method = "km"),
-          mutate(ireadRDS("PCA.RDS"), method = "pca"),
-          mutate(ireadRDS("LDA.RDS"), method = "lda"),
-          mutate(ireadRDS("STM.RDS"), method = "stm"),
-          mutate(ireadRDS("ANTMN.RDS"), method = "antmn"),
-          mutate(ireadRDS("SEEDED.RDS"), method = "seededlda"),
+bind_rows(mutate(ireadRDS("KM.RDS"), method = "K-Means"),
+          mutate(ireadRDS("PCA.RDS"), method = "PCA"),
+          mutate(ireadRDS("LDA.RDS"), method = "LDA"),
+          mutate(ireadRDS("STM.RDS"), method = "STM"),
+          mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN"),
+          mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA"),
           mutate(ireadRDS("KEYATM.RDS"), method = "keyATM")) %>%
-    mutate(maxp = map_dbl(res, max)) %>% mutate(method = factor(method)) %>% mutate(method = fct_relevel(method, "km")) -> all_uni
+    mutate(maxp = map_dbl(res, max)) %>% mutate(method = factor(method)) %>% mutate(method = fct_relevel(method, "K-Means")) -> all_uni
 
-human <- ireadRDS("human_accuracy.RDS") %>% mutate(method = "gold")
+human <- ireadRDS("human_accuracy.RDS") %>% mutate(method = "Gold")
 
-all_uni %>% bind_rows(human) %>% mutate(method_type = case_when(method == "gold" ~ 0,
-                           method %in% c("keyATM", "seededlda") ~ 1,
+all_uni %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                           method %in% c("keyATM", "Seeded LDA") ~ 1,
                            TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
 ##var(all_uni$maxp[all_uni$method_type == "Automatic"])
 ##var(all_uni$maxp[all_uni$method_type == "Semisupervised"])
 
 all_uni %>% filter(!method_type %in% c("Gold")) %>% ggplot(aes(y = maxp, x = method)) + geom_dotplot(binaxis='y', stackdir='center', dotsize=0.2) + facet_grid(cols = vars(method_type), scales = "free_x") + theme_minimal() + theme(legend.position = "none") + ylab(expression(CCR[max]))
+```
+
+### Sensitivity analysis: Without Morality articles
+
+We retested H1 without all Morality articles (Figure \@ref(fig:sen1) ). H1 appears to be less supported when all Morality articles are removed.
+
+```{r sen1, fig.cap = "Distribution of best-case correct classification rates by methods (without Morality articles)", cache = TRUE}
+require(tidyverse)
+require(ggridges)
+
+
+ireadRDS <- function(fname) {
+        readRDS(here::here("intermediate", fname))
+}
+
+
+bind_rows(mutate(ireadRDS("KM.RDS"), method = "K-Means", no_m_res = .gen_no_m_res("KM", p_is_hat_y = TRUE)),
+              mutate(ireadRDS("PCA.RDS"), method = "PCA", no_m_res = .gen_no_m_res("PCA", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("LDA.RDS"), method = "LDA", no_m_res = .gen_no_m_res("LDA", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("STM.RDS"), method = "STM", no_m_res = .gen_no_m_res("STM", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN", no_m_res = .gen_no_m_res("ANTMN", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA", no_m_res = .gen_no_m_res("SEEDED", p_is_hat_y = FALSE)),
+          mutate(ireadRDS("KEYATM.RDS"), method = "keyATM", no_m_res = .gen_no_m_res("KEYATM", p_is_hat_y = FALSE))) -> res
+
+ireadRDS("human_accuracy_k4.RDS")%>% mutate(method = "Gold") %>% select(-desc) -> human
+
+res %>% mutate(maxp = map_dbl(no_m_res, max)) %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                               method %in% c("keyATM", "Seeded LDA") ~ 1,
+                               TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
+
+all_uni$recommend <- FALSE
+
+all_uni[all_uni$method == "ANTMN" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
+
+all_uni %>% mutate(method = fct_relevel(method, "Gold", "Seeded LDA", "keyATM")) %>% ggplot(aes(x = maxp, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed") + xlim(c(0, 0.7)) + xlab(expression(CCR[max])) + ylab("Method") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
+```
+
+## Multiverse analysis of all methods (based on correlation)
+
+The calculation of $CCR_{max}$ makes an assumption that a method can extra a dominant frame. But in fact, most of the methods under consideration can extra multiple "frames" (with the exception of K-Means and the exclusionary item "F1" by the experts). For instance, an LDA model can export for each article a vector of five numbers, $\theta_{t}$. the calculation of $CCR_{max}$ select the highest number among these five numbers as the dominant frame. However, it is possible that the second highest $\theta_{t}$ might match the ground truth. But $CCR_{max}$ does not consider this information.
+
+We vectorize the output $100 \times 5$ matrix $\mathbf{P}$ by stacking the columns of $\mathbf{P}$ on top of one another, i.e.
+
+$$
+\operatorname{vec}(\mathbf{P}) = [p_{1,1}, \ldots, p_{100,1}, p_{1,2}, \ldots, p_{100,2}, \ldots, p_{1,5}, \ldots, p_{100,5}]^\mathrm{T}
+$$
+
+Another way to evaluate the accuracy is to calculate the correlation between two vectorized $\mathbf{P}$ (each with a dimension of $1 \times 500$). The ground truth vector $y$ can be first matricized as a one-hot matrix and vectorized the same way to generate the same $1 \times 500$ vector. For instance:
+
+$$
+y = [1, 2, 3, 1, \ldots, 5]
+$$
+
+$$
+\operatorname{mat}(y) = \begin{bmatrix}
+1 & 0 & 0 & 0 & 0\\
+0 & 1 & 0 & 0 & 0\\
+0 & 0 & 1 & 0 & 0\\
+1 & 0 & 0 & 0 & 0\\
+\vdots & \vdots & \vdots & \vdots & \vdots \\
+0 & 0 & 0 & 0 & 1
+\end{bmatrix}
+$$
+
+Using this approach, we encountered the same problem of not knowing which column in $\mathbf{P}$ corresponds to which actual frame in the ground truth $y$. The same approach of exhaustive search was used and the maximum value of correlation was reported.
+
+These figures display the multiverse analyses of human coding (Figure \@ref(fig:human)), PCA + TF-IDF (Figure \@ref(fig:taupca)), LDA (Figure \@ref(fig:taulda)), STM (Figure \@ref(fig:taustm)), ANTMN (Figure \@ref(fig:tauantmn)), seeded LDA (Figure \@ref(fig:tauseeded)), and KeyATM (Figure \@ref(fig:taukeyatm)). These figures display the analyses using the ground truth (green dots) and the expert coding (orange dots, averaged of the two experts).
+
+```{r tauhuman, fig.cap = "Multiverse analysis of human coding based on correlation"}
+prefix <- "human"
+ireadRDS(paste0(prefix, "_tau.RDS")) %>% mutate(tau_gt = ireadRDS(paste0(prefix, "_tau_gt.RDS"))$tau) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 1) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") + scale_color_brewer(palette="Dark2")
+```
+
+```{r taupca, fig.cap = "Multiverse analysis of PCA based on correlation"}
+prefix <- "PCA"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""))) %>% select(desc, tau, tau_gt) %>% ungroup() %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none") + scale_color_brewer(palette="Dark2")
+```
+
+```{r taustm, fig.cap = "Multiverse analysis of STM based on correlation"}
+prefix <- "STM"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none") + scale_color_brewer(palette="Dark2")
+```
+
+```{r taulda, fig.cap = "Multiverse analysis of LDA based on correlation"}
+prefix <- "LDA"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment") + theme(legend.position = "none") + scale_color_brewer(palette="Dark2")
+```
+
+```{r tauantmn, fig.cap = "Multiverse analysis of ANTMN based on correlation", fig.height = 8}
+prefix <- "ANTMN"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", Alpha: ", alpha, ", kf: ", k_factor)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") + scale_color_brewer(palette="Dark2")
+```
+
+```{r tauseeded, fig.cap = "Multiverse analysis of seeded-LDA based on correlation", fig.height = 8}
+prefix <- "SEEDED"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") + scale_color_brewer(palette="Dark2")
+```
+
+```{r taukeyatm, fig.cap = "Multiverse analysis of keyATM based on correlation", fig.height = 8}
+prefix <- "KEYATM"
+
+mutate(ireadRDS(paste0(prefix, ".RDS")), tau = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau.RDS")), max), tau_gt  = purrr::map_dbl(ireadRDS(paste0(prefix, "_tau_gt.RDS")), max)) %>% rowwise() %>% mutate(desc = paste0(words, ifelse(stopwords, ", sw", ""), ifelse(trim, ", s/d", ""), ", alpha: ", alpha, ", exp", expert)) %>% select(desc, tau, tau_gt) %>% pivot_longer(!desc, names_to = "x", values_to = "tau") %>% ggplot(aes(y = fct_reorder2(desc, x, tau, .desc = FALSE), x = tau, color = x)) + geom_point() + xlim(0, 0.5) + theme_minimal() + xlab("r") + ylab("Treatment")+ theme(legend.position = "none") + scale_color_brewer(palette="Dark2")
+```
+
+### Sensitivity analysis: With correlation, using ground truth
+
+We retested H1 with correlation and ground truth (Figure \@ref(fig:sen2) ). H1 appears to be similarly supported.
+
+```{r sen2, fig.cap = "Distribution of correlation by methods (using ground truth)", cache = TRUE}
+require(tidyverse)
+require(ggridges)
+
+
+ireadRDS <- function(fname) {
+        readRDS(here::here("intermediate", fname))
+}
+
+
+bind_rows(mutate(ireadRDS("PCA.RDS"), method = "PCA", tau = purrr::map_dbl(ireadRDS("PCA_tau_gt.RDS"), max)),
+          mutate(ireadRDS("LDA.RDS"), method = "LDA", tau = purrr::map_dbl(ireadRDS("LDA_tau_gt.RDS"), max)),
+          mutate(ireadRDS("STM.RDS"), method = "STM", tau  = purrr::map_dbl(ireadRDS("STM_tau_gt.RDS"), max)),
+          mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN", tau  = purrr::map_dbl(ireadRDS("ANTMN_tau_gt.RDS"), max)),
+          mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA", tau  = purrr::map_dbl(ireadRDS("SEEDED_tau_gt.RDS"), max)),
+          mutate(ireadRDS("KEYATM.RDS"), method = "keyATM", tau  = purrr::map_dbl(ireadRDS("KEYATM_tau_gt.RDS"), max))) -> res
+
+prefix <- "human"
+ireadRDS(paste0(prefix, "_tau_gt.RDS")) %>% mutate(method = "Gold") %>% select(-desc) -> human
+
+res  %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                               method %in% c("keyATM", "Seeded LDA") ~ 1,
+                               TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
+
+all_uni$recommend <- FALSE
+
+all_uni[all_uni$method == "ANTMN" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
+
+
+all_uni %>% mutate(method = fct_relevel(method, "Gold", "Seeded LDA", "keyATM")) %>% ggplot(aes(x = tau, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + xlim(c(0, 0.5)) + xlab("R") + ylab("Method") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
+```
+
+### Sensitivity analysis: With correlation, using expert coding
+
+We retested H1 with correlation and expert coding (Figure \@ref(fig:sen3) ). H1 appears to be similarly supported. Please note that this is not a task of detecting communicative intention.
+
+```{r sen3, fig.cap = "Distribution of correlation by methods (using expert coding)", cache = TRUE}
+require(tidyverse)
+require(ggridges)
+
+
+ireadRDS <- function(fname) {
+        readRDS(here::here("intermediate", fname))
+}
+
+
+bind_rows(mutate(ireadRDS("PCA.RDS"), method = "PCA", tau = purrr::map_dbl(ireadRDS("PCA_tau.RDS"), max)),
+          mutate(ireadRDS("LDA.RDS"), method = "LDA", tau = purrr::map_dbl(ireadRDS("LDA_tau.RDS"), max)),
+          mutate(ireadRDS("STM.RDS"), method = "STM", tau  = purrr::map_dbl(ireadRDS("STM_tau.RDS"), max)),
+          mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN", tau  = purrr::map_dbl(ireadRDS("ANTMN_tau.RDS"), max)),
+          mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA", tau  = purrr::map_dbl(ireadRDS("SEEDED_tau.RDS"), max)),
+          mutate(ireadRDS("KEYATM.RDS"), method = "keyATM", tau  = purrr::map_dbl(ireadRDS("KEYATM_tau.RDS"), max))) -> res
+
+prefix <- "human"
+ireadRDS(paste0(prefix, "_tau.RDS")) %>% mutate(method = "Gold") %>% select(-desc) -> human
+
+res  %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                               method %in% c("keyATM", "Seeded LDA") ~ 1,
+                               TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
+
+all_uni$recommend <- FALSE
+
+all_uni[all_uni$method == "ANTMN" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
+
+all_uni %>% mutate(method = fct_relevel(method, "Gold", "Seeded LDA", "keyATM")) %>% ggplot(aes(x = tau, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + xlim(c(0, 1)) + xlab("R") + ylab("Method") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
 ```
 
 ## Comparing confidence level of correct and incorrect expert coding
@@ -252,3 +416,14 @@ From this simulation, it is extremely unlikely that increasing the sample size w
 <!-- ```{r, results = "asis", echo = FALSE} -->
 <!-- print2("", readRDS(here::here("intermediate", "brms_mod.RDS"))) -->
 <!-- ``` -->
+
+# References
+
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+
+<div id="refs" custom-style="Bibliography"></div>
+\endgroup

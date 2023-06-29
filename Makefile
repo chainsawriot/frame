@@ -2,9 +2,9 @@
 
 all: render appen
 
-render: frame.bib intermediate/LDA.RDS intermediate/STM.RDS intermediate/KM.RDS intermediate/PCA.RDS intermediate/ANTMN.RDS intermediate/SEEDED.RDS intermediate/KEYATM.RDS intermediate/expert_accuracy.RDS intermediate/brms_mod.RDS
+render: frame.bib intermediate/LDA.RDS intermediate/STM.RDS intermediate/KM.RDS intermediate/PCA.RDS intermediate/ANTMN.RDS intermediate/SEEDED.RDS intermediate/KEYATM.RDS intermediate/expert_accuracy.RDS 
 	Rscript -e "rmarkdown::render('frame_ica_ea.rmd')"
-appen: intermediate/conf_mod.RDS intermediate/sim/brms_mod_sim2000.RDS
+appen: intermediate/conf_mod.RDS intermediate/sim/brms_mod_sim2000.RDS intermediate/expert_accuracy_k4.RDS intermediate/human_tau.RDS
 	Rscript -e "rmarkdown::render('appen.rmd')"
 frame.bib:
 	bibcon -b /home/chainsawriot/dev/dotfiles/bib.bib -o frame.bib frame_ica_ea.rmd
@@ -49,3 +49,7 @@ intermediate/sim/KEYATM_sim2000.RDS: intermediate/sim/lemma_tokens_sim2000.RDS
 intermediate/sim/brms_mod_sim2000.RDS: intermediate/sim/LDA_sim2000.RDS intermediate/sim/STM_sim2000.RDS intermediate/sim/KM_sim2000.RDS intermediate/sim/PCA_sim2000.RDS intermediate/sim/ANTMN_sim2000.RDS intermediate/sim/SEEDED_sim2000.RDS intermediate/sim/KEYATM_sim2000.RDS
 	echo "Simulation done. It took ages."
 	Rscript 15_sim_brms.R
+intermediate/expert_accuracy_k4.RDS:
+	Rscript 18_human_k4.R
+intermediate/human_tau.RDS:
+	Rscript 20_tau.R
