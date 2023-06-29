@@ -1,6 +1,11 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Overview
 
-The analytic plan of this study was preregistered on April 12, 2022 as the following DOI: [https://doi.org/10.17605/OSF.IO/SY6JX](https://doi.org/10.17605/OSF.IO/SY6JX). The data collection (creation of the corpus) started on May 7, 2022 and ended on July 1, 2022. The first round of human coding started on August 1, 2022 and ended on September 1, 2022.
+The analytic plan of this study was preregistered on April 12, 2022 as the following DOI: <!--[https://doi.org/10.17605/OSF.IO/SY6JX](https://doi.org/10.17605/OSF.IO/SY6JX)-->. The data collection (creation of the corpus) started on May 7, 2022 and ended on July 1, 2022. The first round of human coding started on August 1, 2022 and ended on September 1, 2022.
 
 The analysis of data (1st round) started on September 2, 2022 and ended on September 20, 2022.
 
@@ -10,7 +15,7 @@ The exploratory expert coding started on January 30, 2023 (after the analysis of
 
 As reported in the article, the exploratory expert coding was not preregistered and therefore not considered in the main analysis. The simulation study and sensitivity analyses were not preregistered also.
 
-The following are the deviations from the preregistration: [https://doi.org/10.17605/OSF.IO/SY6JX](https://doi.org/10.17605/OSF.IO/SY6JX).
+The following are the deviations from the preregistration: <!--[https://doi.org/10.17605/OSF.IO/SY6JX](https://doi.org/10.17605/OSF.IO/SY6JX) -->.
 
 ## Hypotheses
 
