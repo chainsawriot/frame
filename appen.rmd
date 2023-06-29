@@ -161,19 +161,19 @@ ireadRDS <- function(fname) {
     readRDS(here::here("intermediate", fname))
 }
 
-bind_rows(mutate(ireadRDS("KM.RDS"), method = "km"),
-          mutate(ireadRDS("PCA.RDS"), method = "pca"),
-          mutate(ireadRDS("LDA.RDS"), method = "lda"),
-          mutate(ireadRDS("STM.RDS"), method = "stm"),
-          mutate(ireadRDS("ANTMN.RDS"), method = "antmn"),
-          mutate(ireadRDS("SEEDED.RDS"), method = "seededlda"),
+bind_rows(mutate(ireadRDS("KM.RDS"), method = "K-Means"),
+          mutate(ireadRDS("PCA.RDS"), method = "PCA"),
+          mutate(ireadRDS("LDA.RDS"), method = "LDA"),
+          mutate(ireadRDS("STM.RDS"), method = "STM"),
+          mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN"),
+          mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA"),
           mutate(ireadRDS("KEYATM.RDS"), method = "keyATM")) %>%
-    mutate(maxp = map_dbl(res, max)) %>% mutate(method = factor(method)) %>% mutate(method = fct_relevel(method, "km")) -> all_uni
+    mutate(maxp = map_dbl(res, max)) %>% mutate(method = factor(method)) %>% mutate(method = fct_relevel(method, "K-Means")) -> all_uni
 
-human <- ireadRDS("human_accuracy.RDS") %>% mutate(method = "gold")
+human <- ireadRDS("human_accuracy.RDS") %>% mutate(method = "Gold")
 
-all_uni %>% bind_rows(human) %>% mutate(method_type = case_when(method == "gold" ~ 0,
-                           method %in% c("keyATM", "seededlda") ~ 1,
+all_uni %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                           method %in% c("keyATM", "Seeded LDA") ~ 1,
                            TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
 ##var(all_uni$maxp[all_uni$method_type == "Automatic"])
 ##var(all_uni$maxp[all_uni$method_type == "Semisupervised"])
@@ -195,26 +195,25 @@ ireadRDS <- function(fname) {
 }
 
 
-bind_rows(mutate(ireadRDS("KM.RDS"), method = "km", no_m_res = .gen_no_m_res("KM", p_is_hat_y = TRUE)),
-              mutate(ireadRDS("PCA.RDS"), method = "pca", no_m_res = .gen_no_m_res("PCA", p_is_hat_y = FALSE)),
-              mutate(ireadRDS("LDA.RDS"), method = "lda", no_m_res = .gen_no_m_res("LDA", p_is_hat_y = FALSE)),
-              mutate(ireadRDS("STM.RDS"), method = "stm", no_m_res = .gen_no_m_res("STM", p_is_hat_y = FALSE)),
-              mutate(ireadRDS("ANTMN.RDS"), method = "antmn", no_m_res = .gen_no_m_res("ANTMN", p_is_hat_y = FALSE)),
-              mutate(ireadRDS("SEEDED.RDS"), method = "seededlda", no_m_res = .gen_no_m_res("SEEDED", p_is_hat_y = FALSE)),
+bind_rows(mutate(ireadRDS("KM.RDS"), method = "K-Means", no_m_res = .gen_no_m_res("KM", p_is_hat_y = TRUE)),
+              mutate(ireadRDS("PCA.RDS"), method = "PCA", no_m_res = .gen_no_m_res("PCA", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("LDA.RDS"), method = "LDA", no_m_res = .gen_no_m_res("LDA", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("STM.RDS"), method = "STM", no_m_res = .gen_no_m_res("STM", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN", no_m_res = .gen_no_m_res("ANTMN", p_is_hat_y = FALSE)),
+              mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA", no_m_res = .gen_no_m_res("SEEDED", p_is_hat_y = FALSE)),
           mutate(ireadRDS("KEYATM.RDS"), method = "keyATM", no_m_res = .gen_no_m_res("KEYATM", p_is_hat_y = FALSE))) -> res
 
-ireadRDS("human_accuracy_k4.RDS")%>% mutate(method = "gold") %>% select(-desc) -> human
+ireadRDS("human_accuracy_k4.RDS")%>% mutate(method = "Gold") %>% select(-desc) -> human
 
-res %>% mutate(maxp = map_dbl(no_m_res, max)) %>% bind_rows(human) %>% mutate(method_type = case_when(method == "gold" ~ 0,
-                               method %in% c("keyATM", "seededlda") ~ 1,
+res %>% mutate(maxp = map_dbl(no_m_res, max)) %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                               method %in% c("keyATM", "Seeded LDA") ~ 1,
                                TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
 
 all_uni$recommend <- FALSE
 
-all_uni[all_uni$method == "antmn" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
+all_uni[all_uni$method == "ANTMN" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
 
-
-all_uni %>% mutate(method = fct_relevel(method, "gold", "seededlda", "keyATM")) %>% ggplot(aes(x = maxp, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed") + xlim(c(0, 0.7)) + xlab(expression(CCR[max])) + ylab("Treatment") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
+all_uni %>% mutate(method = fct_relevel(method, "Gold", "Seeded LDA", "keyATM")) %>% ggplot(aes(x = maxp, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + geom_vline(aes(xintercept = 0.29, alpha = 0.5), linetype = "dashed") + geom_vline(aes(xintercept = 0.25, alpha = 0.5), linetype = "dashed") + xlim(c(0, 0.7)) + xlab(expression(CCR[max])) + ylab("Method") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
 ```
 
 ## Multiverse analysis of all methods (based on correlation)
@@ -303,26 +302,26 @@ ireadRDS <- function(fname) {
 }
 
 
-bind_rows(mutate(ireadRDS("PCA.RDS"), method = "pca", tau = purrr::map_dbl(ireadRDS("PCA_tau_gt.RDS"), max)),
-          mutate(ireadRDS("LDA.RDS"), method = "lda", tau = purrr::map_dbl(ireadRDS("LDA_tau_gt.RDS"), max)),
-          mutate(ireadRDS("STM.RDS"), method = "stm", tau  = purrr::map_dbl(ireadRDS("STM_tau_gt.RDS"), max)),
-          mutate(ireadRDS("ANTMN.RDS"), method = "antmn", tau  = purrr::map_dbl(ireadRDS("ANTMN_tau_gt.RDS"), max)),
-          mutate(ireadRDS("SEEDED.RDS"), method = "seededlda", tau  = purrr::map_dbl(ireadRDS("SEEDED_tau_gt.RDS"), max)),
+bind_rows(mutate(ireadRDS("PCA.RDS"), method = "PCA", tau = purrr::map_dbl(ireadRDS("PCA_tau_gt.RDS"), max)),
+          mutate(ireadRDS("LDA.RDS"), method = "LDA", tau = purrr::map_dbl(ireadRDS("LDA_tau_gt.RDS"), max)),
+          mutate(ireadRDS("STM.RDS"), method = "STM", tau  = purrr::map_dbl(ireadRDS("STM_tau_gt.RDS"), max)),
+          mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN", tau  = purrr::map_dbl(ireadRDS("ANTMN_tau_gt.RDS"), max)),
+          mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA", tau  = purrr::map_dbl(ireadRDS("SEEDED_tau_gt.RDS"), max)),
           mutate(ireadRDS("KEYATM.RDS"), method = "keyATM", tau  = purrr::map_dbl(ireadRDS("KEYATM_tau_gt.RDS"), max))) -> res
 
 prefix <- "human"
-ireadRDS(paste0(prefix, "_tau_gt.RDS")) %>% mutate(method = "gold") %>% select(-desc) -> human
+ireadRDS(paste0(prefix, "_tau_gt.RDS")) %>% mutate(method = "Gold") %>% select(-desc) -> human
 
-res  %>% bind_rows(human) %>% mutate(method_type = case_when(method == "gold" ~ 0,
-                               method %in% c("keyATM", "seededlda") ~ 1,
+res  %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                               method %in% c("keyATM", "Seeded LDA") ~ 1,
                                TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
 
 all_uni$recommend <- FALSE
 
-all_uni[all_uni$method == "antmn" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
+all_uni[all_uni$method == "ANTMN" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
 
 
-all_uni %>% mutate(method = fct_relevel(method, "gold", "seededlda", "keyATM")) %>% ggplot(aes(x = tau, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + xlim(c(0, 0.5)) + xlab("R") + ylab("Treatment") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
+all_uni %>% mutate(method = fct_relevel(method, "Gold", "Seeded LDA", "keyATM")) %>% ggplot(aes(x = tau, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + xlim(c(0, 0.5)) + xlab("R") + ylab("Method") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
 ```
 
 ### Sensitivity analysis: With correlation, using expert coding
@@ -339,26 +338,25 @@ ireadRDS <- function(fname) {
 }
 
 
-bind_rows(mutate(ireadRDS("PCA.RDS"), method = "pca", tau = purrr::map_dbl(ireadRDS("PCA_tau.RDS"), max)),
-          mutate(ireadRDS("LDA.RDS"), method = "lda", tau = purrr::map_dbl(ireadRDS("LDA_tau.RDS"), max)),
-          mutate(ireadRDS("STM.RDS"), method = "stm", tau  = purrr::map_dbl(ireadRDS("STM_tau.RDS"), max)),
-          mutate(ireadRDS("ANTMN.RDS"), method = "antmn", tau  = purrr::map_dbl(ireadRDS("ANTMN_tau.RDS"), max)),
-          mutate(ireadRDS("SEEDED.RDS"), method = "seededlda", tau  = purrr::map_dbl(ireadRDS("SEEDED_tau.RDS"), max)),
+bind_rows(mutate(ireadRDS("PCA.RDS"), method = "PCA", tau = purrr::map_dbl(ireadRDS("PCA_tau.RDS"), max)),
+          mutate(ireadRDS("LDA.RDS"), method = "LDA", tau = purrr::map_dbl(ireadRDS("LDA_tau.RDS"), max)),
+          mutate(ireadRDS("STM.RDS"), method = "STM", tau  = purrr::map_dbl(ireadRDS("STM_tau.RDS"), max)),
+          mutate(ireadRDS("ANTMN.RDS"), method = "ANTMN", tau  = purrr::map_dbl(ireadRDS("ANTMN_tau.RDS"), max)),
+          mutate(ireadRDS("SEEDED.RDS"), method = "Seeded LDA", tau  = purrr::map_dbl(ireadRDS("SEEDED_tau.RDS"), max)),
           mutate(ireadRDS("KEYATM.RDS"), method = "keyATM", tau  = purrr::map_dbl(ireadRDS("KEYATM_tau.RDS"), max))) -> res
 
 prefix <- "human"
-ireadRDS(paste0(prefix, "_tau.RDS")) %>% mutate(method = "gold") %>% select(-desc) -> human
+ireadRDS(paste0(prefix, "_tau.RDS")) %>% mutate(method = "Gold") %>% select(-desc) -> human
 
-res  %>% bind_rows(human) %>% mutate(method_type = case_when(method == "gold" ~ 0,
-                               method %in% c("keyATM", "seededlda") ~ 1,
+res  %>% bind_rows(human) %>% mutate(method_type = case_when(method == "Gold" ~ 0,
+                               method %in% c("keyATM", "Seeded LDA") ~ 1,
                                TRUE ~ 2)) %>% mutate(method_type = factor(method_type, levels = c(0,1,2), labels = c("Gold", "Semisupervised", "Automatic"))) -> all_uni
 
 all_uni$recommend <- FALSE
 
-all_uni[all_uni$method == "antmn" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
+all_uni[all_uni$method == "ANTMN" & all_uni$words == "none" & all_uni$trim & all_uni$stopwords,]$recommend <- TRUE
 
-
-all_uni %>% mutate(method = fct_relevel(method, "gold", "seededlda", "keyATM")) %>% ggplot(aes(x = tau, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + xlim(c(0, 1)) + xlab("R") + ylab("Treatment") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
+all_uni %>% mutate(method = fct_relevel(method, "Gold", "Seeded LDA", "keyATM")) %>% ggplot(aes(x = tau, y = method, fill = method_type)) + geom_density_ridges(alpha = 0.5, panel_scaling = TRUE, linetype = "blank")+ geom_density_ridges(aes(point_color = recommend), jittered_points = TRUE, position = position_points_jitter(width = 0.05, height = 0), point_shape = '|', point_size = 3, point_alpha = 1, alpha = 0, panel_scaling = TRUE, linetype = "blank") + xlim(c(0, 1)) + xlab("R") + ylab("Method") + theme_minimal() + scale_discrete_manual("point_color", values = c("#B0B0B0", "#FF0000"), guide = "none") + theme(legend.position = "none")
 ```
 
 ## Comparing confidence level of correct and incorrect expert coding
