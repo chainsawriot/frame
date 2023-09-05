@@ -26,6 +26,7 @@ require(ggplot2)
 require(tidyverse)
 require(cowplot)
 require(ggridges)
+require(irr)
 
 source("lib.R")
 ```
@@ -34,38 +35,64 @@ source("lib.R")
 
 Attribution of responsibility
 
-* Does the story suggest that some level of government has the ability to alleviate the problem?
-* Does the story suggest that some level of the government is responsible for the issue/problem?
-* Does the story suggest solution(s) to the problem/issue?
-* Does the story suggest that an individual (or group of people in society) is responsible for the issue-problem?
-* Does the story suggest the problem requires urgent action?
+* A1: Does the story suggest that some level of government has the ability to alleviate the problem?
+* A2: Does the story suggest that some level of the government is responsible for the issue/problem?
+* A3: Does the story suggest solution(s) to the problem/issue?
+* A4: Does the story suggest that an individual (or group of people in society) is responsible for the issue-problem?
+* A5: Does the story suggest the problem requires urgent action?
 
 Human interest frame
 
-* Does the story provide a human example or “human face” on the issue?
-* Does the story employ adjectives or personal vignettes that generate feelings of outrage, empathy-caring, sympathy, or compassion?
-* Does the story emphasize how individuals and groups are affected by the issue/problem?
-* Does the story go into the private or personal lives of the actors?
-* ~~Does the story contain visual information that might generate feelings of outrage, empathy-caring, sympathy, or compassion?~~
+* B1: Does the story provide a human example or “human face” on the issue?
+* B2: Does the story employ adjectives or personal vignettes that generate feelings of outrage, empathy-caring, sympathy, or compassion?
+* B3: Does the story emphasize how individuals and groups are affected by the issue/problem?
+* B4: Does the story go into the private or personal lives of the actors?
+* ~~B5: Does the story contain visual information that might generate feelings of outrage, empathy-caring, sympathy, or compassion?~~
 
 Conflict frame
 
-* Does the story reflect disagreement between parties/individuals/groups/countries?
-* Does one party/individual/group/country reproach another?
-* Does the story refer to two sides or to more than two sides of the problem or issue?
-* Does the story refer to winners and losers?
+* C1: Does the story reflect disagreement between parties/individuals/groups/countries?
+* C2: Does one party/individual/group/country reproach another?
+* C3: Does the story refer to two sides or to more than two sides of the problem or issue?
+* C4: Does the story refer to winners and losers?
 
 Morality frame
 
-* Does the story contain any moral message?
-* Does the story make reference to morality, God, and other religious tenets?
-* Does the story offer specific social prescriptions about how to behave?
+* D1: Does the story contain any moral message?
+* D2: Does the story make reference to morality, God, and other religious tenets?
+* D3: Does the story offer specific social prescriptions about how to behave?
 
 (Economic) consequences frame
 
-* Is there a mention of financial losses or gains now or in the future?
-* Is there a mention of the costs/degree of expense involved?
-* Is there a reference to economic consequences of pursuing or not pursuing a course of action?
+* E1: Is there a mention of financial losses or gains now or in the future?
+* E2: Is there a mention of the costs/degree of expense involved?
+* E3: Is there a reference to economic consequences of pursuing or not pursuing a course of action?
+
+## Intercoder reliability
+
+After two rounds of precoding and coder training, 10 items were coded by the two student coders. The intercoder reliability is showed below.
+
+```{r irr}
+HJ <- rio::import(here::here("data", "testcoding/Test coding HJ.xlsx")) %>% tibble::as_tibble()
+
+ZO <- rio::import(here::here("data", "testcoding/Test coding ZO.xlsx")) %>% tibble::as_tibble()
+
+## x <- 3
+cal_ka <- function(x, HJ, ZO) {
+    res <- suppressMessages(bind_cols(HJ[,x], ZO[,x]))
+    kripp.alpha(t(res), "ordinal")$value
+}
+
+## cal_ka2 <- function(x, HJ, ZO) {
+##     res <- suppressMessages(bind_cols(as.numeric(HJ[,x] != 0), as.numeric(ZO[,x] != 0)))
+##     kripp.alpha(t(res), "nominal")$value
+## }
+
+item <- stringr::str_sub(colnames(HJ)[3:21], 1, 2)
+res <- purrr::map_dbl(3:21, cal_ka, HJ = HJ, ZO = ZO)
+knitr::kable(tibble::tibble(item = item, "Krippendorff's Alpha" = res), digits = 2)
+##res2 <- purrr::map_dbl(3:21, cal_ka2, HJ = HJ, ZO = ZO)
+```
 
 ## Overview of all automatic and supervised methods employed
 
