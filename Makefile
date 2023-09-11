@@ -3,11 +3,12 @@
 all: render appen
 
 render: frame.bib intermediate/LDA.RDS intermediate/STM.RDS intermediate/KM.RDS intermediate/PCA.RDS intermediate/ANTMN.RDS intermediate/SEEDED.RDS intermediate/KEYATM.RDS intermediate/expert_accuracy.RDS 
-	Rscript -e "rmarkdown::render('frame_ica_ea.rmd')"
+	Rscript -e "rmarkdown::render('manuscript.rmd')"
+	Rscript -e "rmarkdown::render('manuscript.rmd', output_format = 'papaja::apa6_word')"
 appen: intermediate/conf_mod.RDS intermediate/sim/brms_mod_sim2000.RDS intermediate/expert_accuracy_k4.RDS intermediate/human_tau.RDS
 	Rscript -e "rmarkdown::render('appen.rmd')"
 frame.bib:
-	bibcon -b /home/chainsawriot/dev/dotfiles/bib.bib -o frame.bib frame_ica_ea.rmd
+	bibcon -b /home/chainsawriot/dev/dotfiles/bib.bib -o frame.bib manuscript.rmd
 intermediate/lemma_tokens.RDS:
 	Rscript 01_prep.R
 intermediate/LDA.RDS: intermediate/lemma_tokens.RDS

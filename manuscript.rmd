@@ -1,10 +1,12 @@
 ---
-title                 : "Synthesizing an experimental dataset for the evaluation of generic frame detection as a task of detecting communicative intention"
+title                 : "Developing a synthetic news corpus to validate generic frame detection methods"
 shorttitle            : "FRAME DETECTION"
 author:
   - name              : "Chung-hong Chan"
     affiliation   : "1"
     corresponding : yes
+    address       : "Unter Sachsenhausen 6-8, 50667 Cologne, Germany"
+    email : "chung-hong.chan@gesis.org"
   - name              : "Rainer Freudenthaler"
     affiliation   : "2"
   - name              : "Philipp Müller"
@@ -19,7 +21,7 @@ affiliation:
     institution   : "Institute for Media and Communication Studies, University of Mannheim"
 
 authornote: |
-  The anonymized link to the online appendix of this submission: https://osf.io/gkft5/?view_only=8bf2a34000a64c5fa5d645c3f37f681a. The authors would like to thank 1) Valerie Hase (Ludwig-Maximilians-Universität München) for providing keywords to be used in this study, 2) Open Science Office, University of Mannheim, for the financial support, and 3) student assistants: Filippo Borsato, Hannah Erb, Hyosun Jang, Fatih Ozhasar, Zeynep Özgülec, and Jonathan Vincent.
+  The link to the online appendix of this submission: https://osf.io/gkft5/. Preregistration:  https://doi.org/10.17605/OSF.IO/SY6JX. Code and data: https://github.com/chainsawriot/frame. The authors would like to thank 1) Valerie Hase (Ludwig-Maximilians-Universität München) for providing keywords to be used in this study, 2) Open Science Office, University of Mannheim, for the financial support, 3) Sandra Krais for language editing, and 4) student assistants: Filippo Borsato, Hannah Erb, Hyosun Jang, Fatih Ozhasar, Zeynep Özgülec, and Jonathan Vincent.
 
 abstract: |
   Frames are a central concept in communication research. Based on our literature review, we propose that frame identification is an act of identifying selected reality and communicative intention. We then highlight the conceptual and methodological issues of frame identification using computational methods. To avoid the correlation between topics and frames, we provide a synthetic dataset for evaluating frames found in multi-topical news content, using the detection of generic frames as a test case. With this dataset, for the first time, we benchmark manual coding and various automatic and semi-supervised methods. Based on the preliminary benchmark results, this study provides evidence that generic frame identification using both manual coding and automatic methods might not be accurate.
@@ -30,7 +32,7 @@ bibliography          : "frame.bib"
 floatsintext          : yes
 linenumbers           : no
 draft                 : no
-mask                  : yes
+mask                  : no
 figurelist            : no
 tablelist             : no
 footnotelist          : no
